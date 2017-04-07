@@ -1,0 +1,63 @@
+<html>
+<head>
+	<title> Bracket Test </title>
+	<script src='bracket.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+	<script>
+		var entries = [new Entry(1, 'Charles', 'He is a king', 'charles.jpeg'),
+							new Entry(2, 'Mary', 'She is a queen', 'mary.jpeg'),
+							new Entry(3, 'Sir Alexander', 'He is a knight', 'siralex.jpeg'),
+							new Entry(4, 'McDulles', 'He is a general', 'mcdulles.jpeg'),
+							new Entry(5, 'Straus', 'He is a merchant', 'charles.jpeg'),
+							new Entry(6, 'Selia', 'She is a wizard', 'selia.jpeg'),
+							new Entry(7, 'George', 'He is a peasant', 'george.jpeg'),
+							new Entry(8, 'Smithy', 'He is a fool', 'smithy.jpeg') ]
+		var b1 = new Bracket(1, 'Who should rule our Kingdom?', entries, [1,2,3]);
+		var ret = b1.printbracket();
+		console.log(ret);
+		$(document).ready( function() { $('#generated_printbracket').text(ret) } ) ;
+
+		b1.record_user_votes(1, [1,2])
+		b1.process_round();
+		
+		ret = b1.printbracket();
+		console.log(ret);
+		$(document).ready( function() { $('#generated_printbracket').text(ret) } ) ;
+
+		
+	</script>
+	<style>
+		tr:nth-child(even) {background-color: #f2f2f2}
+		th, td {
+		    border-bottom: 1px solid #ddd;
+		    padding: 15px;
+		    text-align: left;		
+		}
+		table {
+		    width: 100%;
+		}
+	</style>
+</head>
+<body>
+	<h1>Test of the Mar Lago Soceity</h1>
+	<table>
+		<tr>
+			<td>
+				<p id="expected_print"> Mar a lago </p>
+			</td>
+
+			<td>
+				<p id="generated_printbracket"> Testing </p>
+			</td>
+
+			<td>
+
+			</td>
+		</tr>
+
+		<tr>
+
+		</tr>
+	</table>
+</body>
+</html>

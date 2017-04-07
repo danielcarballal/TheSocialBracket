@@ -1,0 +1,67 @@
+<head>
+  <title>Social Bracket</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+  {{> header }}
+  <div class="container">
+    {{> bracket}}
+  </div>
+  {{> createitem}}
+
+  <script type="text/javascript"
+ src="//api.filepicker.io/v2/filepicker.js"></script>
+</body>
+
+
+<template name="header">
+  <div class="container header_class">
+    <div class="row">
+      <div class="col-sm-2">
+        <img href="#" src='images/social_bracket_logo.png'>
+      </div>
+      <div class="col-sm-2">
+        <h3> The Social Bracket </h3>
+      </div>
+      {{#if currentUser}}
+      <div class="col-sm-4 col-sm-4-offset">
+        Welcome {{username}}
+      </div>
+      {{else}}
+      <div class="col-sm-4 col-sm-4-offset">
+       {{> loginButtons}}
+       </div>
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="bracket">
+  <div style='margin-top: 20px;'>
+    {{> round }}
+  </div>
+</template>
+
+<template name="round">
+  <div class='round-column col-sm-{{width}}'>
+
+    <!-- FOR EACH -->
+    <div class='bracket-item row'>
+      <div class='entry-storer col-sm-8'>
+        <h6> Title of entry {{width}}</h6>
+      </div>
+      <hr width='50px' size='50px' align='left' class='bracket-horz col-sm-4'>
+    </div>
+  </div>
+</template> 
+
+<template name="info">
+  <h2>Learn Meteor!</h2>
+  <ul>
+    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
+    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
+    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
+    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
+  </ul>
+</template>
