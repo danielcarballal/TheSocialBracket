@@ -4,6 +4,11 @@
 	<script src='bracket.js'></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 	<script>
+		// Bracket function tests with null games
+		var null_brac = new Bracket(2, 'Which null best null', [null,null,null,null], [2, 3, 4]);
+
+
+		// Full Bracket Creation Tests
 		var entries = [new Entry(1, 'Charles', 'He is a king', 'charles.jpeg'),
 							new Entry(2, 'Mary', 'She is a queen', 'mary.jpeg'),
 							new Entry(3, 'Sir Alexander', 'He is a knight', 'siralex.jpeg'),
@@ -15,14 +20,16 @@
 		var b1 = new Bracket(1, 'Who should rule our Kingdom?', entries, [1,2,3]);
 		var ret = b1.printbracket();
 		console.log(ret);
-		$(document).ready( function() { $('#generated_printbracket').text(ret) } ) ;
+		$(document).ready( function() { $('#generated_printbracket1').text(ret) } ) ;
 
-		b1.record_user_votes(1, [1,2])
+		var ret2 = b1.record_user_votes(1, [1,2, 1, 2]);
+		console.log(ret2);
+		$(document).ready( function() { $('#generated_roundproc1').text(ret2) } ) ;
+
 		b1.process_round();
-		
-		ret = b1.printbracket();
-		console.log(ret);
-		$(document).ready( function() { $('#generated_printbracket').text(ret) } ) ;
+		var ret3 = b1.printbracket();
+		console.log(ret3);
+		$(document).ready( function() { $('#generated_printbracket2').text(ret3) } ) ;
 
 		
 	</script>
@@ -43,11 +50,11 @@
 	<table>
 		<tr>
 			<td>
-				<p id="expected_print"> Mar a lago </p>
+				<p id="expected_print1"> Mar a lago </p>
 			</td>
 
 			<td>
-				<p id="generated_printbracket"> Testing </p>
+				<p id="generated_printbracket1"> Testing </p>
 			</td>
 
 			<td>
@@ -56,7 +63,23 @@
 		</tr>
 
 		<tr>
+			<td>
+				<p id="expected_roundproc1"> Voter 1 voted in game 0 for 1 Voter 1 voted in game 1 for 2 Voter 1 voted in game 2 for 1 Voter 1 voted in game 3 for 2 </p>
+			</td>
 
+			<td>
+				<p id="generated_roundproc1"> Testing </p>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<p id="expected_print2"> Mar a lago </p>
+			</td>
+
+			<td>
+				<p id="generated_printbracket2"> Testing </p>
+			</td>
 		</tr>
 	</table>
 </body>

@@ -1,5 +1,9 @@
+import { Meteor } from 'meteor/meteor';
+
 
 const brackets = new Mongo.Collection('brackets');
+const users = new Mongo.Collection('users');
+const entries = new Mongo.Collection('entries');
 
 /*
 The Bracket Class
