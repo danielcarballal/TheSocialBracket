@@ -1,9 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 
-var express =   require("express");
-var multer  =   require('multer');
-var app         =   express();
 /**
+
+
+AppCache solution to image problems 
+
 Meteor.AppCache.config({onlineOnly: ['/online/']});
 
 Meteor.AppCache.config({
@@ -12,7 +13,15 @@ Meteor.AppCache.config({
 	    '/largedata.json'
   ]
 });
+
 **/
+/**
+
+AJAX solution to image problems
+
+var express =   require("express");
+var multer  =   require('multer');
+var app         =   express();
 
 var storage =   multer.diskStorage({
   destination: function (req, file, callback) {
@@ -24,6 +33,7 @@ var storage =   multer.diskStorage({
 });
 
 var upload = multer({ storage : storage}).single('userPhoto');
+
 app.post('/api/photo',function(req,res){
     upload(req,res,function(err) {
         if(err) {
@@ -32,6 +42,7 @@ app.post('/api/photo',function(req,res){
         res.end("File is uploaded");
     });
 });
+**/
 
 Meteor.startup(() => {
 });
