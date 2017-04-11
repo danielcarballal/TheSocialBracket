@@ -1,35 +1,32 @@
 <head>
-  <title>Social Bracket</title>
+  <title> The Social Bracket</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 
 <body>
   {{> header }}
-  <div class="container">
+  <div class="bracket-container">
     {{> bracket}}
   </div>
   {{> createitem}}
-
-  <script type="text/javascript"
- src="//api.filepicker.io/v2/filepicker.js"></script>
 </body>
 
 
 <template name="header">
   <div class="container header_class">
     <div class="row">
-      <div class="col-sm-2">
+      <div class="col-sm-3">
         <img href="#" src='images/social_bracket_logo.png'>
       </div>
-      <div class="col-sm-2">
-        <h3> The Social Bracket </h3>
+      <div class="col-sm-5" style="text-align: center">
+        <h1> The Social Bracket </h1>
       </div>
       {{#if currentUser}}
-      <div class="col-sm-4 col-sm-4-offset">
-        Welcome {{username}}
+      <div class="col-sm-2 col-sm-offset-2 welcome-text">
+        Welcome {{username}}!
       </div>
       {{else}}
-      <div class="col-sm-4 col-sm-4-offset">
+      <div class="col-sm-2 col-sm-offset-2">
        {{> loginButtons}}
        </div>
       {{/if}}
@@ -38,30 +35,36 @@
 </template>
 
 <template name="bracket">
-  <div style='margin-top: 20px;'>
-    {{> round }}
-  </div>
-</template>
-
-<template name="round">
-  <div class='round-column col-sm-{{width}}'>
-
-    <!-- FOR EACH -->
-    <div class='bracket-item row'>
-      <div class='entry-storer col-sm-8'>
-        <h6> Title of entry {{width}}</h6>
-      </div>
-      <hr width='50px' size='50px' align='left' class='bracket-horz col-sm-4'>
+  <!-- There should always be 2**n - 1 entries in this list -->
+  <div class="row">
+    <div class="col-sm-12">
+        <h3 style='text-align: center;'> {{title}} </h3>
     </div>
   </div>
-</template> 
+  {{#each all_entries}}
+    <p> This is an entry {{game_id}} , {{seed}} , {{title}}</p>
+    {{> entry gameid={{game_id}} seed={{seed}} title={{title}} round=2}}
+  {{/each}}
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
+  <ul class='entry-list'> 
+    {{> entry gameid=1 seed=1 title='Illinois' round=2}} 
+    {{> entry gameid=5 seed=1 title='Illinois' round=2}} 
+    {{> entry gameid=1 seed=8 title='Parkland' round=2}} 
+    {{> entry gameid=7 seed=1 title='Illinois' round=2}} 
+    {{> entry gameid=2 seed=4 title='UChicago' round=2}} 
+    {{> entry gameid=5 seed=4 title='UChicago' round=2}} 
+    {{> entry gameid=2 seed=5 title='Loyala' round=2}} 
+    {{> entry gameid=8}} <!-- CHAMPION -->
+    {{> entry gameid=3 seed=3 title='Southern Illionois' round=2}}} 
+    {{> entry gameid=6 seed=6 title='Eastern Illinois' round=2}} 
+    {{> entry gameid=3 seed=6 title='Eastern Illinois' round=2}} 
+    {{> entry gameid=7 seed=7 title='Illinois St.' round=2}} 
+    {{> entry gameid=4 seed=2 title='Northwestern' round=2}} 
+    {{> entry gameid=6 seed=7 title='Illinois St.' round=2}} 
+    {{> entry gameid=4 seed=7 title='Illinois St.' round=2}} 
+
+    {{#each entries_in_order}}
+      {{> entry seed='-1' title=''}} 
+    {{/each}}
   </ul>
 </template>

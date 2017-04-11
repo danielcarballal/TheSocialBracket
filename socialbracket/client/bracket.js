@@ -1,9 +1,28 @@
 import { Meteor } from 'meteor/meteor';
 
 
-const brackets = new Mongo.Collection('brackets');
-const users = new Mongo.Collection('users');
-const entries = new Mongo.Collection('entries');
+var brackets = new Mongo.Collection('brackets');
+// const users = new Mongo.Collection('users');
+var entries = new Mongo.Collection('entries');
+
+
+Template.bracket.helpers({
+	'title' : function(){
+		return 'What is the best party University in Illinois?';
+	},
+	'num_teams' : function(){
+		return 4;
+	},
+	'all_brackets' : function(){
+		console.log('********');
+		console.log(brackets.find({brac_id : 1}).fetch());
+		return brackets.find({brac_id : 1}).fetch();
+	},
+	'all_entries' : function(){
+		console.log(brackets.findOne({brac_id : 1}));
+		return brackets.findOne({brac_id : 1})['entries'];
+	}
+});
 
 /*
 The Bracket Class
@@ -59,7 +78,7 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 		Prints the bracket to the returned string
 	*/
 	this.printbracket = function() {
-		ret = '';
+		var ret = '';
 		var n = this.num_teams;
 		var i = 0;
 		ret += this.brac_title + '\n';
@@ -140,8 +159,43 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	};
 
 	/*
-		Save a bracket to  the 
+		Saves an entry in the following form:
+
+			{game_id, seed, round_num, title, description, image_url, can_vote}
+
+		If an entry has not been determined yet, then game_id=-1
 	*/
+	this.save_entry = function(entry, seed){
+
+	}
+
+	/*
+		Save a bracket to the database in the following schema:
+
+		brac_id: Unique id of a bracket 
+
+		entries: Ordered entries on where they appear on the tree
+
+		brackets.insert(
+				{brac_id : 1,
+				entries : [ {game_id : 1, seed : 1, round_num : 1, title : 'First', description : '', image_url: '', can_vote:false},
+							{game_id : 2, seed : 1, round_num : 2, title : 'First', description : '', image_url:'', can_vote:true},
+							{game_id : 3, seed : 2, round_num : 1, title : 'Second', description : '', image_url:'',can_vote: false} ],
+				num_teams : 2,
+				date_endings: [ 1, 2, 3 ]
+				}
+				)
+	*/
+	this.save_bracket = function() {
+		brackets.update(
+			{brac_id : this.brac_id},
+			{
+				brac_id : this.brac_id,
+
+			},
+			{upsert : true}
+			)
+	}
 }
 
 /*

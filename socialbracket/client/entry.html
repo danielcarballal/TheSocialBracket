@@ -1,0 +1,18 @@
+<template name="entry">
+  <li class='entry-container'>
+      {{#if haschoice}}  
+      <div class='entry-storer' style='background-color: #007FFF'>
+        <div class='entry-title'>
+          <p> <a style='font-size:20px; '> {{seed}} </a> {{title}}  </p>
+        </div>
+        <button class='.btn-success'> > </button>
+      </div>
+      {{else}}
+      <div class='entry-storer'>
+        <div class='entry-title'>
+          <p> <a style='font-size:20px'> {{seed}} </a> {{title}} </p>
+        </div>
+      </div>
+      {{/if}}
+  </li>
+</template>

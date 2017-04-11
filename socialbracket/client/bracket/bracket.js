@@ -1,5 +1,5 @@
 
-const brackets = new Mongo.Collection('brackets');
+// const brackets = new Mongo.Collection('brackets');
 
 /*
 The Bracket Class
@@ -22,21 +22,21 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	this.brac_title = brac_title;
 	this.num_teams = entries.length;
 	num_rounds = Math.log(this.num_teams)/Math.log(2);
-	cur_round = 0;
+	this.cur_round = 1;
 
 	/*
 		The number of rounds must match the number of entries in date_ending
 	*/
 	if(num_rounds != date_endings.length) {
-		console.log("Warning: Improperly formatted Bracket entry");
+		console.log("Warning: Improperly formatted Bracket entry: Make sure that 2**(the number of date_endings) = (number of entries)");
 		return null;
 	};
 
 	/*
 		Array of Game objects representing the results of the games so far.
 	*/
-	this.games_started = [];
-	this.games_completed = [];
+	this.games_array = [];
+	this.games_finished = []
 
 	/*
 		Initialize the array based on the first_round entries
@@ -44,8 +44,10 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	this.first_round = function() {
 		for(var i = 0; i < this.num_teams / 2; i++){
 			var game = new Game(entries[i].entry_id, entries[this.num_teams - (i + 1)].entry_id);
-			console.log(game);
-			this.games_started.push(game);
+			this.games_array.push(game);
+		}
+		for(var i = 0; i < this.num_teams / 2 - 1; i++){
+			this.games_array.push(null);
 		}
 	};
 
@@ -59,15 +61,13 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 		var n = this.num_teams;
 		var i = 0;
 		ret += this.brac_title + '\n';
-		while(n >= 0 && i < this.games_completed.length){
-			ret += 'In round ' + (i + 1) + '\n';
-			ret += this.games_completed[i].get_entry1() + ' is playing ' + this.games_completed[i].entry2 + '\n';
-			i++;
-		}
-		i = 0;
-		while(i < this.games_started.length){
-			ret += 'Right now\n';
-			ret += this.games_started[i].get_entry1() + ' is playing ' + this.games_started[i].entry2 + '\n';
+		ret += 'Round ' + this.cur_round + '\n';
+		console.log(this.games_array);
+		while(i < this.games_array.length){
+			if(this.games_array[i] != null){
+				ret += 'In game ' + (i + 1) + ' : ';
+				ret += entries[this.games_array[i]['entry1']].title + ' is playing ' + this.games_array[i]['entry2'] + '.\n';
+			}
 			i++;
 		}
 		return ret;
@@ -88,18 +88,17 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	*/
 	this.record_user_votes = function(user_id, votes_array){
 		var ret = "";
-		if(votes_array.length != this.games_started.length){
-			return "";
-		}
+		var i = 0;
 
-		var game_index = 0;
-		for(game in this.games_started){
-			// 0 denotes non-vote
-			if(votes_array[game_index] != 0){
-				this.games_started[game_index].add_vote(votes_array[game_index] == 1, user_id);
-				ret += "Voter " + user_id + " voted in game " + game_index + ' for ' + votes_array[game_index] + ' \n';
+		for(var index in this.games_array){
+			var game = this.games_array[index];
+			if(game != null && game.finished === false){
+				if(votes_array[i] != 0){
+					game.add_vote(votes_array[i] === 1, user_id);
+					ret += 'Voter ' + user_id + ' voted for ' + votes_array[i];
+				}
+				i++;
 			}
-			game_index++;
 		}
 		return ret;
 	}
@@ -112,32 +111,42 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	*/
 	this.process_round = function() {
 		var log = "";
-		for(var game in this.games_started){
-			this.games_completed.push(game);
+
+		var team1_id = null;
+		var new_games = {};
+
+		for(var i in this.games_array){
+			var game = this.games_array[i];
+			if(game != null){
+				if(game.finished === false){
+					var team_id = game.winner();
+					if(team1_id === null){
+						team1_id = team_id;
+						log += team1_id + '\n';
+					} else {
+						var g = new Game(team1_id, team_id);
+						log += 'New game added ' + team1_id + ' , ' + team_id;
+						var i = 0;
+						while(this.games_array[i] != null){
+							i++;
+						}
+						if(i === this.games_array.length){
+							log += "\n The bracket has finished";
+							return log;
+						}
+						new_games[i] = g;
+						team1_id = null;
+					}
+					game.finished = true;
+				}
+			}
 		}
-
-		this.games_started = []
-
-		var num_games = this.games_completed.length;
-		var num_teams_left = this.num_teams - this.games_completed.length;
-
-		for(var i = this.num_teams_left - 1; i > 0; i += 2){
-			var team1_id = games_completed[num_games - i].winner();
-			var team2_id = games_completed[num_games - i + 1].winner();
-
-			log += team1_id + ' has won and will face ' + team2_id + ' in the next round \n';
-
-			var g = new Game(team1_id, team2_id);
-			print(g);
-			this.games_started.push(g);
+		for(i in new_games){
+			this.games_array[i] = new_games[i];
 		}
-		console.log(this.games_started);
+		this.cur_round += 1;
 		return log;
 	};
-
-	/*
-		Save a bracket to  the 
-	*/
 }
 
 /*
@@ -152,11 +161,7 @@ function Game(entry1_id, entry2_id){
 	this.entry1 = entry1_id;
 	this.entry2 = entry2_id;
 
-	this.get_entry1 = function(){ 
-		return entry1_id
-	};
-
-	this.entry2 = entry2_id;
+	this.finished = false;
 
 	/**
 		Sets representing the voter id's who voted for a given side.
@@ -175,7 +180,7 @@ function Game(entry1_id, entry2_id){
 		
 		Returns whether the vote was recorded accuretly.
 	*/
-	this.add_vote = function(is_entry_1, voter_id){
+	this.add_vote = function(is_entry_1, voter_id){ 
 		if (voter_id == null){
 			return false;
 		}
@@ -197,21 +202,37 @@ function Game(entry1_id, entry2_id){
 			return true;
 		}
 	}
-
 	/*
 		Returns the entry that is currently winning.
 
 		TODO: Account for some sort of tiebreaker
 	*/
 	this.winner = function(){
-		if (this.entry1_votes > this.entry2_votes){
-			return this.entry1_id;
-		} else if (this.entry1_votes < this.entry2_votes){
-			return this.entry1_id;
+		if (this.entry1_votes.size > this.entry2_votes.size ){
+			return this['entry1'];
+		} else if (this.entry1_votes.size < this.entry2_votes.size ){
+			return this['entry2'];
 		}
-		return 
+		return this['entry1'];
+	}
+
+	/*
+		Returns the entry that is currently winning.
+
+		TODO: Account for some sort of tiebreaker
+	*/
+	this.loser = function(){
+		if (this.votes_1() > this.votes_2()){
+			return this['entry2_id'];
+		} else if (this.votes_1() < this.votes_2()){
+			return this['entry1_id'];
+		}
+		return this['entry2_id'];
 	}
 }
+
+
+entries = {}
 
 /*
 	Class for an entry participating in a bracket.
@@ -228,6 +249,7 @@ function Entry(entry_id, title, description, image_url){
 	this.title = title;
 	this.description = description;
 	this.image_url = image_url;
+	entries[entry_id] = this;
 
 	this.get_entry_id = function(){return this.entry_id;};
 	this.get_title = function(){return this.title;};

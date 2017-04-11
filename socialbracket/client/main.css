@@ -7,6 +7,10 @@
 	border: 3px black solid;
 }
 
+.entry-title {
+	margin-left: 20px;
+}
+
 
 .round-column:nth-child(2n + 1) {
 	/* border-right: 3px black solid; */
@@ -15,11 +19,58 @@
 .bracket-horz {
 	border: 0;
     height: 4px;
-    background: #333;
-    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+    /* background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc); */
 }
 
 .bracket-item {
 	height: 200px;
 	display: inline-block;
+}
+
+.login-link-text {
+	text-decoration: none;
+	color: purple;
+	width: 100%;
+	font-size: 24px;
+}
+
+.welcome-text {
+	text-decoration: none;
+	color: purple;
+	width: 100%;
+	font-size: 24px;
+}
+
+.entry-list{
+	white-space:nowrap;
+}
+
+.entry-container {
+	list-style-type: none;
+	width: 200px;
+}
+
+.entry-container:nth-child(2n) {
+	margin-left: 200px;
+}
+
+p.entry-container:nth-child(4n) {
+	color: red;
+}
+
+.entry-container:nth-child(4n) {
+	margin-left: 400px;
+}
+
+.entry-container:nth-child(8n) {
+	margin-left: 600px;
+}
+
+.bracket-container {
+	border: 3px black solid;
+	background-color: #ADD8E6;
+	margin-top: 25px;
+	margin-left:50px;
+	margin-right: 50px;
 }
