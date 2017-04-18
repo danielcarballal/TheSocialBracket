@@ -1,0 +1,21 @@
+.vote_butt{
+	width:50%;
+	margin-left:25%;
+}
+
+.entry-container {
+	list-style-type: none;
+	width: 175px;
+}
+
+.entry-container:nth-child(2n) {
+	margin-left: 175px;
+}
+
+.entry-container:nth-child(4n) {
+	margin-left: 350px;
+}
+
+.entry-container:nth-child(8n) {
+	margin-left: 525px;
+}

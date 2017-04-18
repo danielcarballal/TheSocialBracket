@@ -1,0 +1,95 @@
+
+<template name='createbracket'>
+<div class='col-sm-8 col-sm-offset-3'>
+	<div class='row'>
+	<h1 style='text-align: center'> Bracket Creation</h1>
+	<div class='createbracket container'>
+		<div class="row">
+			{{temp}}
+			{{#if hasTitle }}
+			{{title}}
+			<div class="col-sm-2 col-sm-1-offset">
+				<input class='w3-input' type='text' id='bracket_title' placeholder='Bracket Title' />
+				<input class='w3-input' type='text' id='bracket_description' placeholder='Description' />
+				Private? <input type='checkbox' id='private' />
+				<p> Number of teams </p>
+				<select name="numteams" id='numteams'>
+				    <option value="four" selected>4</option>
+				    <option value="eight">8</option>
+				    <option value="sixteen">16</option>
+				</select>
+				<button style="width:100%" class='btn-success next'> Next </button>
+			</div>
+				{{#if missed_form}}
+					<p style="font-color: red"> Title and description required </p>
+				{{/if}}
+			{{else}}
+			{{title}}
+				{{> entrycreationlist }}
+				{{> roundendslist }}
+				<button style="width:100%" id='submit_bracket'> Create Bracket </button>
+			{{/if}}
+		</div>	
+	</div>
+	</div>
+</div>
+</template>
+
+<!-- Contains template for creating a new entry or selecting from existing ones -->
+<template name='entrycreationlist'>
+  	<div class='entry_creator w3-container col-sm-3'>
+  		<div class='row'>
+		  	<h3 style='text-align: center'> Create Entry </h3>
+			  {{> createentry }}
+			<button class='create_entry' style="width:50%; margin-left:25%"> Add Entry </button>
+		</div>
+		<div class='row existingentries'>
+			{{> entrylist }}
+		</div>
+	</div>
+	<div class='col-sm-3 chosenentries-holder'>
+		<h3> Entries for {{title}} </h3>
+		{{#each entry_needed}}
+			{{@index}}: {{> chosenentry }}
+		{{/each}}
+	</div>
+</template> 
+
+<template name='entrylist'>
+	<div class='w3-light-gray entrylist'>
+		<h4> Or choose one someone else created! </h4>
+		<div class='entrylist-holder' style="color:black">
+			{{#each all_entries}}
+				<p> {{title}} : {{description}} </p>
+			{{/each}}
+		</div>
+	</div>
+</template>
+
+<template name='chosenentry'>
+	<p> Entry {{ entryid }}: {{ name }} </p>
+</template>
+
+<template name='roundendslist'>
+	{{> datepicker num=1 }}
+</template>
+
+<template name='datepicker'>
+	<div class='row'>
+		<p> Round 1 end time: </p>
+		<input type='text' placeholder='DD' /> /
+		<input type='text' placeholder='MM' /> /
+		<input type='text' placeholder='YY' />
+	</div>
+</template>
+
+
+<template name='createentry'>
+  <div class='create-entry-container'>
+  	<h4> New Entry </h4>
+	<label> Title </label>
+	<input id='newEntryTitle' type="text" style="color:black" name="title" placeholder="Title" color="black" />
+	<label> Description </label>
+	<input id='newEntryDescription' class='w3-input' style="color:black" type="text" name="description" placeholder="Description" />
+  </div>
+</template>

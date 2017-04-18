@@ -1,5 +1,29 @@
 
-// const brackets = new Mongo.Collection('brackets');
+/*
+	Class for an entry participating in a bracket.
+
+	@Parameters:
+	entry_id : unique ID of some entry
+	title: Title of the entry
+	description: Seriously, pretty easy
+	image_url: Contains the answer to life, love and everything.
+
+*/
+exports.Entry = function(entry_id, title, description, image_url){
+	this.entry_id = entry_id;
+	this.title = title;
+	this.description = description;
+	this.image_url = image_url;
+	this.num_votes = 0;
+
+	this.get_entry_id = function(){
+		return this.entry_id;
+	}
+
+	this.get_title = function(){
+		return this.title;
+	};
+}
 
 /*
 The Bracket Class
@@ -17,12 +41,24 @@ and so on.
 date_endings: Array of Dates that signify when each round should end
 
 */ 
-function Bracket(brac_id, brac_title, entries, date_endings) {
+exports.Bracket = function(brac_id, brac_title, brac_entries, date_endings) {
 	this.brac_id = brac_id;
 	this.brac_title = brac_title;
-	this.num_teams = entries.length;
+	this.num_teams = brac_entries.length;
 	num_rounds = Math.log(this.num_teams)/Math.log(2);
 	this.cur_round = 1;
+
+	this.num_games_this_round = this.num_teams / 2;
+	this.num_games_finished = 0;
+
+	this.entries = {}
+
+	/*
+		Initialize this.entries to map entry id's to 
+	*/
+	for(var i = 0; i < brac_entries.length; i++){
+		this.entries[brac_entries[i]['entry_id']] = brac_entries[i];
+	}
 
 	/*
 		The number of rounds must match the number of entries in date_ending
@@ -33,17 +69,16 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	};
 
 	/*
-		Array of Game objects representing the results of the games so far.
+		Array of Game objects representing the results of the games so far. Will start with many null games, should never need to grow after initizialization
 	*/
 	this.games_array = [];
-	this.games_finished = []
 
 	/*
 		Initialize the array based on the first_round entries
 	*/
 	this.first_round = function() {
 		for(var i = 0; i < this.num_teams / 2; i++){
-			var game = new Game(entries[i].entry_id, entries[this.num_teams - (i + 1)].entry_id);
+			var game = new Game(brac_entries[i], brac_entries[this.num_teams - i - 1]);
 			this.games_array.push(game);
 		}
 		for(var i = 0; i < this.num_teams / 2 - 1; i++){
@@ -66,8 +101,9 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 		while(i < this.games_array.length){
 			if(this.games_array[i] != null){
 				ret += 'In game ' + (i + 1) + ' : ';
-				ret += entries[this.games_array[i]['entry1']].title + ' is playing ' + this.games_array[i]['entry2'] + '.\n';
-			}
+				if(entries[this.games_array[i]['entry2']] != null){
+					ret += entries[this.games_array[i]['entry1']].title + ' is playing ' + entries[this.games_array[i]['entry2']].title + '.\n';
+			}	}
 			i++;
 		}
 		return ret;
@@ -94,8 +130,13 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 			var game = this.games_array[index];
 			if(game != null && game.finished === false){
 				if(votes_array[i] != 0){
-					game.add_vote(votes_array[i] === 1, user_id);
-					ret += 'Voter ' + user_id + ' voted for ' + votes_array[i];
+					if(votes_array[i] === 1){
+						game.add_vote(true, user_id);
+						ret += 'Voter ' + user_id + ' voted for ' + getEntry(game['entry1']).get_title() + '\n';
+					} else {
+						game.add_vote(false, user_id);
+						ret += 'Voter ' + user_id + ' voted for ' + getEntry(game['entry2']).get_title() + '\n';
+					}
 				}
 				i++;
 			}
@@ -115,38 +156,101 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 		var team1_id = null;
 		var new_games = {};
 
-		for(var i in this.games_array){
-			var game = this.games_array[i];
+		//this.num_teams / (this.cur_round  + 1) represents the number of games this round
+		var games_this_round = this.num_teams / Math.pow(this.cur_round,2);
+
+		for(var game_ind = this.num_games_finished; game_ind < this.num_games_finished + games_this_round; game_ind++){
+			var game = this.games_array[game_ind];
 			if(game != null){
+				console.log(game);
 				if(game.finished === false){
 					var team_id = game.winner();
 					if(team1_id === null){
 						team1_id = team_id;
-						log += team1_id + '\n';
+						var entry1 = game.entry1;
 					} else {
-						var g = new Game(team1_id, team_id);
-						log += 'New game added ' + team1_id + ' , ' + team_id;
-						var i = 0;
-						while(this.games_array[i] != null){
+						var i = game_ind;
+						while(this.games_array[i] != null || new_games[i] != null){
 							i++;
 						}
-						if(i === this.games_array.length){
+						console.log(log);
+						if(i >= this.games_array.length){
 							log += "\n The bracket has finished";
 							return log;
 						}
+						var g = new Game(team1_id, team_id);
+						log += 'New game ' + i + ' added between ' + team1_id + ' ' + team_id + '\n';
 						new_games[i] = g;
 						team1_id = null;
 					}
+					console.log(log);
 					game.finished = true;
 				}
 			}
 		}
+		this.num_games_finished += games_this_round;
+
+
+		if(team1_id != null){
+			return "ERROR: There were an odd number of teams found";
+		}
+
 		for(i in new_games){
 			this.games_array[i] = new_games[i];
 		}
 		this.cur_round += 1;
 		return log;
 	};
+
+	this.load_entries = function(){
+
+	}
+
+	/*
+		Saves an entry in the following form:
+
+			{game_id, seed, round_num, title, description, image_url, can_vote}
+
+		If an entry has not been determined yet, then game_id=-1
+
+		will save to the MongoDB
+	*/
+	this.save_entry = function(entry, seed){
+
+	}
+
+	/* Returns list of ordered entries ready for printing */
+	this.ordered_entries = function(){
+		
+	}
+
+	/*
+		Save a bracket to the database in the following schema:
+
+		brac_id: Unique id of a bracket 
+
+		entries: Ordered entries on where they appear on the tree
+
+		brackets.insert(
+				{brac_id : 1,
+				entries : [ {game_id : 1, seed : 1, round_num : 1, title : 'First', description : '', image_url: '', can_vote:false},
+							{game_id : 2, seed : 1, round_num : 2, title : 'First', description : '', image_url:'', can_vote:true},
+							{game_id : 3, seed : 2, round_num : 1, title : 'Second', description : '', image_url:'',can_vote: false} ],
+				num_teams : 2,
+				date_endings: [ 1, 2, 3 ]
+				}
+				)
+	*/
+	this.save_bracket = function() {
+		brackets.update(
+			{brac_id : this.brac_id},
+			{
+				brac_id : this.brac_id,
+
+			},
+			{upsert : true}
+			)
+	}
 }
 
 /*
@@ -156,10 +260,15 @@ function Bracket(brac_id, brac_title, entries, date_endings) {
 	entry1_id: int representing the unique entry id of the first entry
 	entry2_id: int representing the unique entry id of the first entry
 */
-function Game(entry1_id, entry2_id){
+function Game(entry1, entry2){
 
-	this.entry1 = entry1_id;
-	this.entry2 = entry2_id;
+	this.entry1 = entry1['entry_id'];
+	this.entry2 = entry2['entry_id'];
+
+	console.log('Game created ' + this.entry1 + ' vs ' +this.entry2);
+
+	this.bracket_entry_1 = entry1;
+	this.bracket_entry_2 = entry1;
 
 	this.finished = false;
 
@@ -201,7 +310,21 @@ function Game(entry1_id, entry2_id){
 			this.entry2_votes.add(voter_id);
 			return true;
 		}
+		this.entry1.votes++;
+		this.entry2.votes++;
 	}
+
+	/* Returns a string describirng the state of this game */
+	this.matchup = function(){
+		if(this.winner() === this.entry1){
+			return bracket_entry_1['title'] + ' is leading ' + bracket_entry_2['title'] + 
+				' by ' + Math.abs(this.entry1_votes.size - this.entry2_votes.size) + ' votes\n'; 
+		} else {
+			return bracket_entry_2['title'] + ' is leading ' + bracket_entry_1['title'] + 
+				' by ' + Math.abs(this.entry1_votes.size - this.entry2_votes.size) + ' votes\n'; 
+		}
+	}
+
 	/*
 		Returns the entry that is currently winning.
 
@@ -222,44 +345,11 @@ function Game(entry1_id, entry2_id){
 		TODO: Account for some sort of tiebreaker
 	*/
 	this.loser = function(){
-		if (this.votes_1() > this.votes_2()){
-			return this['entry2_id'];
-		} else if (this.votes_1() < this.votes_2()){
-			return this['entry1_id'];
+		if (this.entry1_votes.size < this.entry2_votes.size ){
+			return this['entry1'];
+		} else if (this.entry1_votes.size > this.entry2_votes.size ){
+			return this['entry2'];
 		}
-		return this['entry2_id'];
-	}
-}
-
-
-entries = {}
-
-/*
-	Class for an entry participating in a bracket.
-
-	@Parameters:
-	entry_id : unique ID of some entry
-	title: Title of the entry
-	description: Seriously, pretty easy
-	image_url: Contains the answer to life, love and everything.
-
-*/
-function Entry(entry_id, title, description, image_url){
-	this.entry_id = entry_id;
-	this.title = title;
-	this.description = description;
-	this.image_url = image_url;
-	entries[entry_id] = this;
-
-	this.get_entry_id = function(){return this.entry_id;};
-	this.get_title = function(){return this.title;};
-}
-
-/*
-	Function for retrieving the entry from entries with entry id eid
-*/
-function getEntry(eid, entries){
-	for(entry in entries){
-		if(entry.get_entry_id == eid) return entry;
+		return this['entry1'];
 	}
 }

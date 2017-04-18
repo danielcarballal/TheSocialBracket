@@ -1,70 +1,86 @@
 <head>
   <title> The Social Bracket</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src='styles/bootstrap.js'></script>
 </head>
 
 <body>
-  {{> header }}
-  <div class="bracket-container">
-    {{> bracket}}
-  </div>
-  {{> createitem}}
+  {{> sidebar }}
 </body>
 
+<template name='main_contain'>
+  {{> Template.dynamic template=main}}
+</template>
 
-<template name="header">
-  <div class="container header_class">
-    <div class="row">
-      <div class="col-sm-3">
-        <img href="#" src='images/social_bracket_logo.png'>
-      </div>
-      <div class="col-sm-5" style="text-align: center">
-        <h1> The Social Bracket </h1>
-      </div>
-      {{#if currentUser}}
-      <div class="col-sm-2 col-sm-offset-2 welcome-text">
-        Welcome {{username}}!
-      </div>
-      {{else}}
-      <div class="col-sm-2 col-sm-offset-2">
-       {{> loginButtons}}
+<!-- Template with list of all brackets. Links to those brackets -->
+<template name="bracketlist">
+  <div class="col-sm-8 col-sm-offset-4">
+  <h1> Bracket List </h1>
+  <div class="container">
+    {{#each allBrackets}}
+      <div class="row link_to_brac" id={{_id}} href="localhost:3000/bracket/{{_id}}" style="border: 2px black solid">
+        <div class='col-sm-4'>
+          {{title}}
        </div>
-      {{/if}}
-    </div>
+       <div class='col-sm-4'>
+          {{description}}
+       </div>
+      </div>
+    {{/each}}  
   </div>
+</div>
+</template>
+
+<template name="sidebar">
+  <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+         <p style="color: white"> Welcome </p>
+            <li>
+                <a id="see_all_brackets" href='http://localhost:3000/all_brackets'>See all Brackets</a>
+            </li>
+            <li>
+                <a href="">My brackets</a>
+            </li>
+            <li>
+                <a href="http://localhost:3000/createbracket">Create bracket</a>
+            </li>
+            <li>
+              {{> loginButtons}}
+            </li>
+        </ul>
+    </div>
 </template>
 
 <template name="bracket">
-  <!-- There should always be 2**n - 1 entries in this list -->
-  <div class="row">
-    <div class="col-sm-12">
-        <h3 style='text-align: center;'> {{title}} </h3>
+  <div class='col-sm-8 col-sm-offset-4 bracket-container'>
+    <!-- There should always be 2**n - 1 entries in this list -->
+    <div class="row">
+      <div class="col-sm-12">
+          <h3 style='text-align: center;'> Bracket {{bracid}} : {{title}} </h3>
+      </div>
     </div>
-  </div>
-  {{#each all_entries}}
-    <p> This is an entry {{game_id}} , {{seed}} , {{title}}</p>
-    {{> entry gameid={{game_id}} seed={{seed}} title={{title}} round=2}}
-  {{/each}}
-
-  <ul class='entry-list'> 
-    {{> entry gameid=1 seed=1 title='Illinois' round=2}} 
-    {{> entry gameid=5 seed=1 title='Illinois' round=2}} 
-    {{> entry gameid=1 seed=8 title='Parkland' round=2}} 
-    {{> entry gameid=7 seed=1 title='Illinois' round=2}} 
-    {{> entry gameid=2 seed=4 title='UChicago' round=2}} 
-    {{> entry gameid=5 seed=4 title='UChicago' round=2}} 
-    {{> entry gameid=2 seed=5 title='Loyala' round=2}} 
-    {{> entry gameid=8}} <!-- CHAMPION -->
-    {{> entry gameid=3 seed=3 title='Southern Illionois' round=2}}} 
-    {{> entry gameid=6 seed=6 title='Eastern Illinois' round=2}} 
-    {{> entry gameid=3 seed=6 title='Eastern Illinois' round=2}} 
-    {{> entry gameid=7 seed=7 title='Illinois St.' round=2}} 
-    {{> entry gameid=4 seed=2 title='Northwestern' round=2}} 
-    {{> entry gameid=6 seed=7 title='Illinois St.' round=2}} 
-    {{> entry gameid=4 seed=7 title='Illinois St.' round=2}} 
-
-    {{#each entries_in_order}}
-      {{> entry seed='-1' title=''}} 
+    {{all_brac}}
+    <ul class='entry-list'> 
+      {{> entry gameid=1 seed=1 title='Illinois' round=2}} 
+      {{> entry gameid=5 seed=1 title='Illinois' round=2}} 
+      {{> entry gameid=1 seed=8 title='Parkland' round=2}} 
+      {{> entry gameid=7 seed=1 title='Illinois' round=2}} 
+      {{> entry gameid=2 seed=4 title='UChicago' round=2}} 
+      {{> entry gameid=5 seed=4 title='UChicago' round=2}} 
+      {{> entry gameid=2 seed=5 title='Loyala' round=2}} 
+      {{> entry gameid=8}} <!-- CHAMPION -->
+      {{> entry gameid=3 seed=3 title='Southern Illionois' round=2}}} 
+      {{> entry gameid=6 seed=6 title='Eastern Illinois' round=2}} 
+      {{> entry gameid=3 seed=6 title='Eastern Illinois' round=2}} 
+      {{> entry gameid=7 seed=7 title='Illinois St.' round=2}} 
+      {{> entry gameid=4 seed=2 title='Northwestern' round=2}} 
+      {{> entry gameid=6 seed=7 title='Illinois St.' round=2}} 
+      {{> entry gameid=4 seed=7 title='Illinois St.' round=2}} 
+    </ul>
+    {{#each all_entries_basic }}
+      <h1> Entry : {{title}} </h1>
     {{/each}}
-  </ul>
+</div>
 </template>
+

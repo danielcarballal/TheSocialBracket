@@ -2,10 +2,19 @@
   <li class='entry-container'>
       {{#if haschoice}}  
       <div class='entry-storer' style='background-color: #007FFF'>
-        <div class='entry-title'>
-          <p> <a style='font-size:20px; '> {{seed}} </a> {{title}}  </p>
+        <div class='row'>
+          <div class='col-sm-6'>
+            <div class='entry-title'>
+              <p> <a style='font-size:20px; '> {{seed}} </a> {{title}}  </p>
+            </div>
+          </div>
+          <div class='col-sm-2'>
+            <p> Votes: 0 </p>
+          </div>
+          <div class='col-sm-2'>
+            <button class='.btn-success vote_butt'> > </button>
+          </div>
         </div>
-        <button class='.btn-success'> > </button>
       </div>
       {{else}}
       <div class='entry-storer'>
