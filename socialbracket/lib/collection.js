@@ -5,6 +5,8 @@
 
 import { Bracket } from './bracket.js';
 import { GameTree } from './bracket.js';
+
+import { ProcessRound } from './bracket.js';
 import { Mongo } from 'meteor/mongo';
 
 import { _ } from 'underscore';
@@ -45,7 +47,7 @@ export class BracketsCollection extends Mongo.Collection {
     doc.brac_round = 0;
     doc.usersVoted = [];
 
-    console.log('********');
+    console.log('****INFO****');
     console.log('Bracket creation process information');
     console.log(doc);
 
@@ -108,88 +110,11 @@ export class BracketsCollection extends Mongo.Collection {
     Meteor Collection Method for updating all of the brackets found by selector
   */
   nextRound(selector){
-    var nextRound = -1;
-
-    /*
-      Process round, given the current list ordered lists
-    */
-    var process_func = function(x){
-      var ret_arr = [];
-
-      //First pass -- update entries whose matchups need filling
-      for(var i = 0; i < x.length; i++){
-        var entry = x[i];
-        if(entry['entry'] == null){
-          if(entry['matchup'] != null){
-
-            console.log('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')
-            console.log(x);
-
-            //Find the entry with the most numVotes in x, and pull their entry information
-            var max_entry = x.reduce( (acc, dont_need_this_garbage, curIndex, x) => 
-                              x[curIndex]['entry'] == null ? 
-                                acc : (x[curIndex]['matchup'] == entry['matchup'] && x[curIndex]['numVotes'] > acc['numVotes'] ? 
-                                  x[curIndex] : acc),
-                              {numVotes : '-1',
-                                entry : null} );
-
-            nextRound = max_entry['round'] + 1;
-
-            // New push item will be an option for the user in the next game. 
-            var entry_push = {
-              numVotes : 0,
-              round : max_entry['round'] + 1, 
-              entry : max_entry['entry'],
-              seed : max_entry['seed']
-            }
-            ret_arr.push(entry_push);
-          } else {
-            ret_arr.push(x[i]);
-          }
-        } else {
-          // If it is a current game 
-          x[i].finished = true;
-          x[i].matchup = null;
-          ret_arr.push(x[i]);
-        }
-      }
-
-      // Second pass -- add new matchup result entries to previously undecided round. We will
-      // Find which elements should face each other in the next round.
-      var matchup_id = 1;
-      
-      for(var i = 0; i < ret_arr.length; i++){
-        if(ret_arr[i].round === nextRound){
-          ret_arr[i]['matchup'] = matchup_id;
-
-          while(i < ret_arr.length && ret_arr[i] != ' Undecided!!'){
-            i++;
-          }
-
-          if(i < ret_arr.length){
-            ret_arr[i] = {matchup : matchup_id};
-            end_of_bracket = false;
-          }
-
-          while(i < ret_arr.length && ret_arr[i].round != nextRound){
-            i++;
-          }
-
-          if(i < ret_arr.length){
-            ret_arr[i]['matchup'] = matchup_id;
-          }
-
-          matchup_id++;
-        }
-      }
-      return ret_arr;
-    }
-
     const original_entries = Brackets.findOne(selector)['ord_entries'];
 
     // process_func(original_entries);
 
-    var ret_arr = process_func(original_entries);
+    var ret_arr = ProcessRound(original_entries);
 
     var end_of_bracket = true;
     for(var i = 0; i < ret_arr.length; i++){
@@ -198,11 +123,7 @@ export class BracketsCollection extends Mongo.Collection {
       }
     }
 
-    if(nextRound != -1){
-      console.log('********');
-      console.log('Bracket round process information');
-      console.log(ret_arr);
-      console.log(end_of_bracket);
+    if(original_entries != null){
       Brackets.update(selector, 
         {$set : 
           { ord_entries : ret_arr,
@@ -260,14 +181,14 @@ export const Brackets = new BracketsCollection('brackets');
 export const Entries = new EntriesCollection('entries');
 
 if(Meteor.isServer){
-  console.log('*************');
+  console.log('******INFO*******');
   console.log('Bracket Information\n');
   console.log('Count : ' + Brackets.find({}).count());
   console.log('**************');
 
-  console.log('*************');
+  console.log('******INFO*******');
   console.log('Entries Information\n');
-  console.log('Count : ' + Brackets.find({}).count());
+  console.log('Count : ' + Entries.find({}).count());
   console.log('**************');
 }
 

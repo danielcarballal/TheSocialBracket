@@ -1,0 +1,44 @@
+<!-- Template for individual bracket -->
+<template name="bracket">
+  <div class='row header-create'>
+      <div class='col-sm-12'>
+        <h1> Bracket </h1>
+      </div>
+  </div>
+  {{#if exists}}
+    <div class='col-sm-9 col-sm-offset-3 bracket-container'>
+      <!-- There should always be 2**n - 1 entries in this list -->
+      <div class="row">
+        <div class="col-sm-12">
+          <h3 style='text-align: center;'> {{title}} </h3>  
+          <p style='font-style:italic'> {{description}} </p>
+          {{#if winnerFound}}
+            <div class='winner entry-storer row' id='{{ent.entry_id}}' matchup='{{ent.matchup}}'>
+              <div class='entry-title col-sm-9'>
+                  <p class='entry-style'> Winner: {{victorTitle}}</p>
+              </div>
+              <div class='col-sm-3'>
+                <img style='width:100%' src='{{victorImage}}'>
+              </div>
+            </div>
+          {{/if}}
+          <p style='font-style:italic'> Created {{#if username}} by {{username}} {{/if}} on {{createdAt}} </p>
+        </div>
+      </div>
+
+      {{> tree oent=orderedentries }}
+       <p style="color : red"> {{ errorMessage }} </p>
+      <button id="submitVotes" class="btn-primary my_button"> Submit your votes! </button>
+      {{#if user_is_creator }}
+        <button id="nextRound" class="btn-success my_button"> Next Round </button>
+        <button id="deleteBracket" class="btn-danger my_button"> Delete Bracket </button>
+      {{/if}}
+    </div>
+  {{else}}
+    <div class='col-sm-9 col-sm-offset-3 bracket-container'>
+      <h3 style='text-align: center;'> No Bracket Found! </h3>  
+      <p style='font-style:italic'> This bracket seems to have been deleted or moved. </p>
+    </div>
+  {{/if}}
+
+</template>

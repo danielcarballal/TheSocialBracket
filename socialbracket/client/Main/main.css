@@ -26,7 +26,6 @@ body {
 
 .entry-storer {
 	border-radius: 25px;
-	border: 3px black solid;
   cursor: pointer;
 }
 
@@ -222,5 +221,23 @@ html {
 }
 
 .entry-container:nth-child(8n + 1) {
+  margin-left: 525px;
+}
+
+.entry-container-alt {
+  list-style-type: none;
+  border-radius: 10px;
+  width: 175px;
+}
+
+.entry-container-alt:nth-child(2n + 1) {
+  margin-left: 175px;
+}
+
+.entry-container-alt:nth-child(4n + 1) {
+  margin-left: 350px;
+}
+
+.entry-container-alt:nth-child(8n + 1) {
   margin-left: 525px;
 }

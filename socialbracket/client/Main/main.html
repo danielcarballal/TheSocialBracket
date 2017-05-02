@@ -25,12 +25,12 @@
           <h1> Bracket List </h1>
         </div>
     </div>
-    <div class="container">
+    <div class="container" style='margin-left: 80px; margin-top:20px'>
       <div class="row bracket-title rounded" style='color: white; background-color: #808080;'>
         <div class='col-sm-2'>
             <h4 class='userhint'> Title </h4>
         </div>
-        <div class='col-sm-4'>
+        <div class='col-sm-3'>
             <h4 class='userhint'> Description </h4>
         </div>
         <div class='col-sm-2'>
@@ -41,11 +41,11 @@
         </div>
       </div>
       {{#each allBrackets}}
-        <div class="row bracket_entry" style='margin-top: 2px'>
-          <div class='col-sm-2' style='border-right: 2px black solid'>
+        <div class="row bracket_entry" style='margin-top: 2px;'>
+          <div class='col-sm-2'>
             <p>  {{title}} </p>
          </div>
-         <div class='col-sm-4' style='font-family: serif; font-style:italic;'>
+         <div class='col-sm-3' style='font-family: serif; font-style:italic;'>
             <p> {{description}} </p>
          </div>
          <div class='col-sm-2' style='font-family: serif; font-style:italic;'>
@@ -68,12 +68,12 @@
           <h1> Your Brackets </h1>
         </div>
     </div>
-    <div class="container" style='margin: 20px;'>
+    <div class="container" style='margin-left: 80px; margin-top:20px'>
       <div class="row bracket-title rounded" style='color: white; background-color: #808080;'>
         <div class='col-sm-2'>
             <h4 class='userhint'> Title </h4>
         </div>
-        <div class='col-sm-4'>
+        <div class='col-sm-3'>
             <h4 class='userhint'> Description </h4>
         </div>
         <div class='col-sm-2'>
@@ -124,54 +124,9 @@
     </div>
 </template>
 
-<!-- Template for individual bracket -->
-<template name="bracket">
-  <div class='row header-create'>
-      <div class='col-sm-12'>
-        <h1> Bracket </h1>
-      </div>
-  </div>
-  {{#if exists}}
-    <div class='col-sm-9 col-sm-offset-3 bracket-container'>
-      <!-- There should always be 2**n - 1 entries in this list -->
-      <div class="row">
-        <div class="col-sm-12">
-          <h3 style='text-align: center;'> {{title}} </h3>  
-          <p style='font-style:italic'> {{description}} </p>
-          {{#if winnerFound}}
-            <div class='winner entry-storer row' id='{{ent.entry_id}}' matchup='{{ent.matchup}}'>
-              <div class='entry-title col-sm-9'>
-                  <p class='entry-style'> Winner: {{victorTitle}}</p>
-              </div>
-              <div class='col-sm-3'>
-                <img style='width:100%' src='{{victorImage}}'>
-              </div>
-            </div>
-          {{/if}}
-          <p style='font-style:italic'> Created {{#if username}} by {{username}} {{/if}} on {{createdAt}} </p>
-        </div>
-      </div>
-
-      {{> tree oent=orderedentries }}
-       <p style="color : red"> {{ errorMessage }} </p>
-      <button id="submitVotes" class="btn-primary my_button"> Submit your votes! </button>
-      {{#if user_is_creator }}
-        <button id="nextRound" class="btn-success my_button"> Next Round </button>
-        <button id="deleteBracket" class="btn-danger my_button"> Delete Bracket </button>
-      {{/if}}
-    </div>
-  {{else}}
-    <div class='col-sm-9 col-sm-offset-3 bracket-container'>
-      <h3 style='text-align: center;'> No Bracket Found! </h3>  
-      <p style='font-style:italic'> This bracket seems to have been deleted or moved. </p>
-    </div>
-  {{/if}}
-
-</template>
-
 <template name='tree'>
   {{#each ent in oent}}
-    <li class='entry-container'>
+    <li class='entry-container-alt'>
     {{#if ent.userChoice}}
       <div class='entry-storer row' id='{{ent.entry_id}}' style='background-color: green' matchup='{{ent.matchup}}'>
           <div class='entry-title col-sm-8'>
@@ -183,7 +138,7 @@
       </div>
     {{else}}
       {{#if ent.hasChoice}}  
-        <div class='entry-storer row' id='{{ent.entry_id}}' style='background-color: #007FFF' matchup='{{ent.matchup}}' seed='{{ent.seed}}'>
+        <div class='entry-storer entries-chosen-alt row' id='{{ent.entry_id}}' style='background-color: #007FFF' matchup='{{ent.matchup}}' seed='{{ent.seed}}'>
             <div class='col-sm-8'>
               <div class='row entry-title'>
                 <a class='seed-entry'> {{ent.seed}} </a>
@@ -196,7 +151,7 @@
             </div>
         </div>
         {{else}}
-        <div class='entry-storer row' seed='{{ent.seed}}'>
+        <div class='entry-storer entries-chosen-alt row' seed='{{ent.seed}}'>
             <div class='entry-title col-sm-8'>
               <p> {{ent.entry.entry_title}} </p>
             </div>

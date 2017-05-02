@@ -4,7 +4,8 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { BlazeLayout } from 'meteor/kadira:blaze-layout';
 import { Meteor } from 'meteor/meteor';
 
-import { Brackets } from '../lib/collection.js';
+import { Brackets } from '../../lib/collection.js';
+import { Entries } from '../../lib/collection.js';
 
 import { Session } from 'meteor/session';
 

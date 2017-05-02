@@ -1,13 +1,14 @@
 import { Session } from 'meteor/session';
 
-import { Entries } from '../lib/collection.js';
-import { Brackets } from '../lib/collection.js';
+import { Brackets } from '../../lib/collection.js';
+import { Entries } from '../../lib/collection.js';
 import { $ } from 'meteor/jquery';
 
-entry_id_array = [];
+entry_json_formatted_array = [];
 
-Session.set('entriesselect', entry_id_array);
+Session.set('entriesselect', entry_json_formatted_array);
 Session.set('numteams', 0);
+Session.set('searchParam', '');
 Session.set('randomize', false);
 //const Entries = new Mongo.Collection('entries');
 
@@ -41,9 +42,10 @@ function shuffle(array) {
 
 Template.createbracket.events({
 	'click #back'(event,instance){
-		entry_id_array = [];
+		entry_json_formatted_array = [];
 		Session.set('entriesselect', []);
 		Session.set('numteams', 0);
+		Session.set('searchParam', '')
 		Session.set('randomize', false);
 		Session.set('errorMessage', '');
 		BlazeLayout.render('createbracket');
@@ -81,7 +83,7 @@ Template.createbracket.events({
 
 		var entryid = Math.random().toString(36).substring(7);
 		
-		entry_id_array = Session.get('entriesselect');
+		entry_json_formatted_array = Session.get('entriesselect');
 
 		/* 
 			Shuffle the brackets
@@ -89,12 +91,12 @@ Template.createbracket.events({
 
 		var doRandom = Session.get
 		if($('#randomize').val() === 'on'){
-			entry_id_array = shuffle(entry_id_array);
+			entry_json_formatted_array = shuffle(entry_json_formatted_array);
 		}
-		entry_id_array = shuffle(entry_id_array);
+		entry_json_formatted_array = shuffle(entry_json_formatted_array);
 
-		for(var seed = 1; seed <= entry_id_array.length; seed++){
-			entry_id_array[seed - 1]['seed'] = seed;
+		for(var seed = 1; seed <= entry_json_formatted_array.length; seed++){
+			entry_json_formatted_array[seed - 1]['seed'] = seed;
 		}
 
 		// An image can either be selected in the logo or ented through custom Image URL
@@ -118,7 +120,7 @@ Template.createbracket.events({
 		var entry_json = { 
 			entry_id : entryid, 
 			entry_title : entry_title, 
-			seed : entry_id_array.length + 1,
+			seed : entry_json_formatted_array.length + 1,
 			image_url : image_url,
 			num_bracs : 0
 		}
@@ -128,9 +130,9 @@ Template.createbracket.events({
 			if(error){
 				Session.set('errorMessage', error['error']);
 			} else {
-				entry_id_array = Session.get('entriesselect');
-				entry_id_array.push(entry_json);
-				Session.set('entriesselect', entry_id_array);
+				entry_json_formatted_array = Session.get('entriesselect');
+				entry_json_formatted_array.push(entry_json);
+				Session.set('entriesselect', entry_json_formatted_array);
 				$('#' + Session.get('id_selected')).css('border', '');
 				Session.set('id_selected', null);
 				BlazeLayout.render('createbracket', {title : FlowRouter.getParam('title'), description : FlowRouter.getParam('description'), privateBracket : FlowRouter.getParam('privateBracket') });
@@ -173,14 +175,15 @@ Template.createbracket.events({
 				var bracid = Brackets.findOne({title : Session.get('title'), description : Session.get('description')})['_id'];
 				Session.set('entriesselect', []);
 				Session.set('numteams', 0);
+				Session.set('searchParam', '')
 				Session.set('randomize', false);
 				Session.set('errorMessage', '');
 				Session.set('bracid', bracid);
 
 				// Update the new entries
-				entry_id_array = Session.get('entriesselect');
-				for(var i = 0; i < entry_id_array.length; i++){
-					Meteor.call('entries.addOne', entry_id_array[i]);
+				entry_json_formatted_array = Session.get('entriesselect');
+				for(var i = 0; i < entry_json_formatted_array.length; i++){
+					Meteor.call('entries.addOne', entry_json_formatted_array[i]);
 				}
 				FlowRouter.go('bracket', {bracid : bracid});
 			}
@@ -227,7 +230,52 @@ Template.entrylist.helpers({
 		Finds all entries. Unused currently.
 	*/ 
 	'all_entries' : function(){
-		return Entries.find();
+		/* Have to pass in valid regex, get it from search input */
+		if(alphabet){
+			return Entries.find({ entry_title : {$regex : regex_string_temp} },
+				{
+					sort: 
+						[
+							['num_bracs', 'desc'],
+							['entry_title', 'asc']
+						]
+				});
+		} else {
+			return Entries.find({ entry_title : {$regex : regex_string_temp} },
+				{
+					sort: 
+						[
+							['num_bracs', 'desc'],
+							['entry_title', 'asc']
+						]
+				});
+		}
+	},
+	/*
+		Shows entries with respect to if the searchParam session param has been set.
+		If it is true, then we sort by entry title, otherwise, we use the number of brackets
+		that have been used
+	*/
+	'all_entries_alphabet' : function(){
+		var alphabet = Session.get('searchParam');
+
+		if(!alphabet){
+			return Entries.find({ },
+				{
+					sort: 
+						{
+							entry_title : 1
+						}
+				});
+		} else {
+			return Entries.find({ },
+				{
+					sort: 
+						{
+							num_bracs : 1
+						}
+				});
+		}
 	},
 	/*
 		Finds all entries and sorts them by 
@@ -251,6 +299,9 @@ Template.entrylist.helpers({
 });
 
 Template.entrylist.events({
+	/*
+		On clicking a holder, add it to our list of entry_jsons
+	*/
 	'click .entrylist-holder'(event, instance){
 		var entryid = event['currentTarget']['id'];
 
@@ -260,9 +311,15 @@ Template.entrylist.events({
 			seed : -1, // will be set later
 			image_url : $('#' + entryid).attr('imageurl')
 		}
-		entry_id_array.push(entry_json);
-		console.log(entry_id_array);
-		Session.set('entriesselect', entry_id_array);
+		entry_json_formatted_array.push(entry_json);
+
+		Session.set('entriesselect', entry_json_formatted_array);
+
+		BlazeLayout.render('createbracket', {privateBracket : FlowRouter.getParam('privateBracket')});
+	},
+	'click #searchEntry'(event, instance){
+		var v = $('#searchEntry').val() == 'on';
+		Session.set('searchParam', v);
 
 		BlazeLayout.render('createbracket', {privateBracket : FlowRouter.getParam('privateBracket')});
 	}

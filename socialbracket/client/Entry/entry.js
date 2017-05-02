@@ -2,7 +2,8 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Meteor } from 'meteor/meteor';
 
-import { Entries } from '../lib/collection.js';
+import { Brackets } from '../../lib/collection.js';
+import { Entries } from '../../lib/collection.js';
 
 Template.entry.helpers({
 	'haschoice' : function(){ 

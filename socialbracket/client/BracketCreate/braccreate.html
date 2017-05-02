@@ -2,13 +2,13 @@
 <template name='createbracket'>
 	<div class='col-sm-10 col-sm-offset-2'>
 		<div class='row'>
-			<div class='createbracket'>
+			<div class='col-sm-12'>
 				<div class="row">
 					<div class="col-sm-10 col-sm-offset-1 title-creation-box">
 						{{#if hasTitle}}
 							<div class='row' style='background-color: #808080;'>
 								<p class='userinfo'>
-									Welcome to The Social Bracket! This is your chance to use brackets to answer some of the most pressing questions you might have. This of anything you want: sports, history, politics, or anything really and make a question. Then share the link with your friends and see their opinions flood in!
+									Welcome to The Social Bracket! This is your chance to use brackets to answer some of the most pressing questions you might have. Think of anything you want: sports, history, politics, or anything really and make a question. Then share the link with your friends and see their opinions flood in!
 								</p>
 								<h3 class='step1'> 1 </h3> 
 								<h4 class='col-sm-offset-1'> What interesting question could be Bracketized? </h4>
@@ -64,7 +64,7 @@
 								</div>
 							</div>
 
-							
+							<p style="color: red"> {{errorMessage}} </p>
 							<div class='row' style='margin-top: 20px; padding: 20px;'>
 								<button class="btn-success my-button" id='submit_bracket'> Create Bracket </button>
 								<button class="btn-warning my-button" id='back'> Restart </button>
@@ -122,9 +122,12 @@
 
 <template name='entrylist'>
 	<h4> Or choose one someone else created! </h4>
-	<input id='searchEntry' type=search class='form-control' name="searchEntry" placeholder="Search entries..." />
 	<div class='scrollable'>
-		{{#each all_entries_indiscriminate}}
+		<div class='row' style='padding: 2px;'>
+			<input id='searchEntry' type='checkbox' name="searchEntry" style='width:50%'/> 
+			<div class='col-sm-6'> <p class='userhint'> List By Most Popular </p> </div>
+		</div>
+		{{#each all_entries_alphabet}}
 			<div class='entries-chosen row' id='{{entry_title}}'>
 				<div class='col-sm-4'>
 					<img class='entrylogo' src='{{image_url}}'>

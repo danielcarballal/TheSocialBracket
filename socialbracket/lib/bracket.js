@@ -1,4 +1,6 @@
 
+UNDECIDED_STRING = 'Game not processed'
+
 /*
 	Class for an entry participating in a bracket.
 
@@ -15,6 +17,8 @@ export const Entry = function (entry_id, title, description, image_url){
 	this.description = description;
 	this.image_url = image_url;
 }
+
+
 
 /*
 The Bracket Class
@@ -45,8 +49,6 @@ export const Bracket = function (brac_dict) {
 	this.gt = new GameTree(brac_entries);
 
 	this.num_teams = brac_entries.length;
-
-	num_rounds = Math.log(this.num_teams)/Math.log(2);
 	this.cur_round = 1;
 
 	/*
@@ -91,7 +93,7 @@ export const GameTree = function(initial_entries){
 
 			var entry_func = function() { 
 				if(!decided){
-					return 'Undecided';
+					return UNDECIDED_STRING;
 				}
 				if(child1.votesFor > child2.votesFor){
 					return child1.entry();
@@ -192,13 +194,10 @@ export const GameTree = function(initial_entries){
 			retOrdered.push(entry_push);
 		}
 		else if(node.child1.decided){
-			console.log('~~~~~~~~');
-			console.log(node.child1);
-			console.log(node.child1['entry']);
 			var entry_pushed = {matchup : node.child1['entry']['matchup']};
 			retOrdered.push(entry_pushed);
 		}else{
-			retOrdered.push(' Undecided!!');
+			retOrdered.push(UNDECIDED_STRING);
 		}
 		this.orderedEntriesWrapped(node.child2, retOrdered);
 		return retOrdered;
@@ -216,8 +215,7 @@ export const GameTree = function(initial_entries){
 		// Currently has an entry, so is play and we should not have to check the children
 		if(node['entry'] != null ){
 			if(node['entry']['matchup'] == matchup){
-				console.log('(((((((((((');
-				console.log(node['entry']);
+
 			}
 		}
 	}
@@ -229,6 +227,73 @@ export const GameTree = function(initial_entries){
 	}
 };
 
-export const GameTreePlayed = function(initial_entries, games_so_far){
-	console.log('OTHER GAME TREE');	
+/*
+  Process round, given the current list ordered lists
+*/
+export const ProcessRound = function(x){
+  var ret_arr = [];
+
+  //First pass -- update entries whose matchups need filling
+  for(var i = 0; i < x.length; i++){
+    var entry = x[i];
+    if(entry['entry'] == null){
+      if(entry['matchup'] != null){
+        //Find the entry with the most numVotes in x, and pull their entry information
+        var max_entry = x.reduce( (acc, dont_need_this_garbage, curIndex, x) => 
+                          x[curIndex]['entry'] == null ? 
+                            acc : (x[curIndex]['matchup'] == entry['matchup'] && x[curIndex]['numVotes'] > acc['numVotes'] ? 
+                              x[curIndex] : acc),
+                          {numVotes : '-1',
+                            entry : null} );
+
+        nextRound = max_entry['round'] + 1;
+
+        // New push item will be an option for the user in the next game. 
+        var entry_push = {
+          numVotes : 0,
+          round : max_entry['round'] + 1, 
+          entry : max_entry['entry'],
+          seed : max_entry['seed']
+        }
+        ret_arr.push(entry_push);
+      } else {
+        ret_arr.push(x[i]);
+      }
+    } else {
+      // If it is a current game 
+      x[i].finished = true;
+      x[i].matchup = null;
+      ret_arr.push(x[i]);
+    }
+  }
+
+  // Second pass -- add new matchup result entries to previously undecided round. We will
+  // Find which elements should face each other in the next round.
+  var matchup_id = 1;
+  
+  for(var i = 0; i < ret_arr.length; i++){
+    if(ret_arr[i].round === nextRound){
+      ret_arr[i]['matchup'] = matchup_id;
+
+      while(i < ret_arr.length && ret_arr[i] != UNDECIDED_STRING){
+        i++;
+      }
+
+      if(i < ret_arr.length){
+        ret_arr[i] = {matchup : matchup_id};
+        end_of_bracket = false;
+      }
+
+      while(i < ret_arr.length && ret_arr[i].round != nextRound){
+        i++;
+      }
+
+      if(i < ret_arr.length){
+        ret_arr[i]['matchup'] = matchup_id;
+      }
+
+      matchup_id++;
+    }
+  }
+  return ret_arr;
 }
