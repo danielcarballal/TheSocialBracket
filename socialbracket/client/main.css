@@ -1,44 +1,86 @@
 /* CSS declarations go here */
 
+body {
+  background-image : url("http://i.imgur.com/A2rqm.png");
+}
+
+.logo_wrap {
+  font-weight: bold;
+  color : white;
+  font-size: 20px;
+  margin:20px;
+  border-bottom: 2px white solid;
+  border-top: 2px white solid;
+  font-family: Gothem;
+}
+
+.logo {
+  color : white;
+  width: 50%;
+  height: 100px;
+  border: 1px solid #999999;
+  padding : 10px;
+  border-radius: 50%;
+  background-image: linear-gradient(to right, #825201, #b6964c);
+}
 
 .entry-storer {
 	border-radius: 25px;
 	border: 3px black solid;
+  cursor: pointer;
 }
 
 .entry-title {
 	margin-left: 20px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  pointer-events : none;
 }
 
-
-.round-column:nth-child(2n + 1) {
-	/* border-right: 3px black solid; */
+.entry-style {
+  margin: 0px;
+  font-size : 100%;
+  vertical-align: baseline;
+  font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events : none;
 }
 
-.bracket-horz {
-	border: 0;
-    height: 4px;
-    /* background: #333;
-    background-image: linear-gradient(to right, #ccc, #333, #ccc); */
+.seed-entry{
+  margin: 0px; 
+  color: white;
+  cursor: pointer;
+  pointer-events: none;
 }
 
-.bracket-item {
-	height: 150px;
-	display: inline-block;
+.num-votes-style{
+  font-family:sans-serif; 
+  margin: 0px; 
+  font-size:12px; 
+  color:red;
 }
 
-.entry-list{
-	white-space:nowrap;
-}
-
-body {
-	background: #ADD8E6;
+.winner {
+  background-image: url("http://makolaholding.co.za/assets/images/flags/Flags_BlueStyle3_1024x1024.jpg");
+  min-height : 200px;
+  font-size:36px;
+  font-family: Georgia;
 }
 
 .bracket-container {
 	border: 3px black solid;
 	border-radius: 10px;
 	margin-top: 125px;
+}
+
+.bracket_entry {
+  padding: 20px;
+}
+
+.bracket_entry:nth-child(2n) {
+  background-color: gray;
 }
 
 body,
@@ -151,4 +193,21 @@ html {
     position: relative;
     margin-right: 0;
   }
+}
+
+.entry-container {
+  list-style-type: none;
+  width: 175px;
+}
+
+.entry-container:nth-child(2n + 1) {
+  margin-left: 175px;
+}
+
+.entry-container:nth-child(4n + 1) {
+  margin-left: 350px;
+}
+
+.entry-container:nth-child(8n + 1) {
+  margin-left: 525px;
 }

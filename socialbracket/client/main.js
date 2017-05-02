@@ -4,6 +4,9 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { BlazeLayout } from 'meteor/kadira:blaze-layout';
 import { Meteor } from 'meteor/meteor';
 
+import { Brackets } from '../lib/collection.js';
+
+import { Session } from 'meteor/session';
 // var Brackets = new Mongo.Collection('brackets');
 
 
@@ -11,37 +14,37 @@ Template.sidebar.onCreated(function sidebarOnCreated(){
 	Meteor.subscribe('users');
 });
 
-Template.sidebar.helpers({
-	'username' : function(){
-		if(Template.instance.user.get() == null){
-			return "No user";
-		}
-		return Template.instance.user.get().username;
-	}
-});
-
-Template.bracketlist.onCreated(function bracketlistCreated(){
-	$(document).ready(function() {
-	    $(".link_to_brac").click(function(event) {
-	        // this.append wouldn't work
-	        console.log('JQUERY');
-	    });
-	});
-})
-Template.bracketlist.helpers({
-	'allBrackets' : function(){
-		return Brackets.find();
-	}
-});
-
 Template.bracketlist.events({
 	'click .link_to_brac'(event, instance){
-		event.preventDefault();
-		//console.log('localhost:3000/bracket/' + event['target'].id);
-    	//window.open('localhost:3000/bracket/' + event['target'].id, '_blank' );
-		BlazeLayout.render('bracket', { bracid  : event['target'].id }) ;
+		var linkid = event['target']['id'];
+		FlowRouter.go('bracket', { bracid : linkid });
 	}
 })
+
+Template.bracketlist.helpers({
+	'allBrackets' : function(){
+		return Brackets.find({});
+	}
+});
+
+Template.personalbracketlist.helpers({
+	'allBrackets' : function(){
+		return Brackets.find({creatorID : Meteor.userId() });
+	}
+});
+
+Template.tree.events({
+	'click .entry-storer'(event, instance){
+		var id = event.currentTarget.id;
+		var matchup = $('#' + id).attr('matchup');
+		var seed = $('#' + id).attr('seed');
+		curWinners = Session.get('chosenWinners');
+		curWinners[matchup] = seed;
+		Session.set('chosenWinners', curWinners);
+		BlazeLayout.render('bracket', { _id : Session.get('bracid') }) ;
+	}
+});
+
 
 /*
 		ROUTING INFORMATION
@@ -55,9 +58,9 @@ FlowRouter.route('/bracket/:bracid', {
     name: 'bracket',
     action: function(params) {
     	const id_num = params.bracid;
-    	console.log(id_num);
-    	console.log(Brackets.findOne({_id : id_num} ));
-        BlazeLayout.render('bracket', { bracid : id_num }) ;
+    	Session.set('chosenWinners', {});
+    	Session.set('bracid', id_num);
+        BlazeLayout.render('bracket', { _id : id_num }) ;
     }
 });
 
@@ -68,10 +71,16 @@ FlowRouter.route('/all_brackets', {
 	}
 });
 
+FlowRouter.route('/my_brackets', {
+	name : 'personal_bracket_list',
+	action: function(params){
+		BlazeLayout.render('personalbracketlist');
+	}
+});
+
 FlowRouter.route('/createbracket', {
 	name : 'create_bracket',
 	action: function(params, queryParams){
-		console.log(queryParams['bracket_title']);
 		if(queryParams['num_teams'] != undefined ){
 			var var_teams = 16;
 			if(queryParams['num_teams'] === 'four'){

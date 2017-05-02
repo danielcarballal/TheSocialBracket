@@ -1,95 +1,126 @@
 
 <template name='createbracket'>
-<div class='col-sm-8 col-sm-offset-3'>
-	<div class='row'>
-	<h1 style='text-align: center'> Bracket Creation</h1>
-	<div class='createbracket container'>
-		<div class="row">
-			{{temp}}
-			{{#if hasTitle }}
-			{{title}}
-			<div class="col-sm-2 col-sm-1-offset">
-				<input class='w3-input' type='text' id='bracket_title' placeholder='Bracket Title' />
-				<input class='w3-input' type='text' id='bracket_description' placeholder='Description' />
-				Private? <input type='checkbox' id='private' />
-				<p> Number of teams </p>
-				<select name="numteams" id='numteams'>
-				    <option value="four" selected>4</option>
-				    <option value="eight">8</option>
-				    <option value="sixteen">16</option>
-				</select>
-				<button style="width:100%" class='btn-success next'> Next </button>
+	<div class='col-sm-10 col-sm-offset-2'>
+		<div class='row header-create'>
+			<div class='col-sm-12'>
+				<h1> Bracket Creation </h1>
 			</div>
-				{{#if missed_form}}
-					<p style="font-color: red"> Title and description required </p>
-				{{/if}}
-			{{else}}
-			{{title}}
-				{{> entrycreationlist }}
-				{{> roundendslist }}
-				<button style="width:100%" id='submit_bracket'> Create Bracket </button>
-			{{/if}}
-		</div>	
+		</div>
+		<div class='row'>
+			<div class='createbracket'>
+				<div class="row">
+					<div class="col-sm-10 col-sm-offset-1 title-creation-box">
+						{{#if hasTitle}}
+							<div class='row'>
+								<p class='userinfo'>
+									Welcome to The Social Bracket! This is your chance to use brackets to answer some of the most pressing questions you might have. This of anything you want: sports, history, politics, or anything really and make a question. Then share the link with your friends and see their opinions flood in!
+								</p>
+								<h3 class='step1'> 1 </h3> 
+								<h5 class='col-sm-offset-1'> What interesting question could be Bracketized? </h5>
+							</div>
+							<div class='row'>
+								<div class='col-sm-11 col-sm-offset-1'>
+									<h6 class='userhint'> Bracket Title </h6>
+									<input class='w3-input' type='text' id='bracket_title'/>
+								</div>
+							</div>
+							<div class='row'>
+								<div class='col-sm-11 col-sm-offset-1'>
+									<h6 class='userhint'> Description </h6>
+									<textarea class='w3-input' rows='3' id='bracket_description' placeholder='Description'> </textarea>
+								</div>
+							</div>
+							<div class='row'>
+								<div class='col-sm-offset-1'>
+									<p class='userhint'> Number of teams </p>
+									<select name="numteams" id='numteams'>
+									    <option value="four" selected>4</option>
+									    <option value="eight">8</option>
+									    <option value="sixteen">16</option>
+									</select>
+								</div>
+							</div>
+							<p style="color: red"> {{errorMessage}} </p>
+							<div class='row'>
+								<div class='col-sm-offset-1'>
+									Private? <input type='checkbox' id='private' />
+								</div>
+							</div>
+							<button style="width:100%" class='btn-success next'> Next </button>
+						{{else}}
+							<div class='row'>
+								<h3 class='step1'> 2 </h3> 
+								<h5 style='font-family : Ariel, Helvetica, Georgia'> Choose the entries you think might do well. Choose your entries in the order you want the seeds. </h5>
+							</div>
+							<div class='row'>
+								{{> entrycreationlist}}
+							</div>
+							<p style="color: red"> {{errorMessage}} </p>
+							<div class='row' style='margin-top: 20px'>
+								<button class="btn-success my-button" id='submit_bracket'> Create Bracket </button>
+								<button class="btn-warning my-button" id='back'> Restart </button>
+							</div>
+						{{/if}}
+					</div>
+				</div>	
+			</div>
+		</div>
 	</div>
-	</div>
-</div>
 </template>
 
 <!-- Contains template for creating a new entry or selecting from existing ones -->
 <template name='entrycreationlist'>
-  	<div class='entry_creator w3-container col-sm-3'>
-  		<div class='row'>
+  	<div class='entry-creator w3-container col-sm-4 rounded'>
+  		<div class='row createentry'>
 		  	<h3 style='text-align: center'> Create Entry </h3>
 			  {{> createentry }}
 			<button class='create_entry' style="width:50%; margin-left:25%"> Add Entry </button>
 		</div>
-		<div class='row existingentries'>
-			{{> entrylist }}
-		</div>
 	</div>
-	<div class='col-sm-3 chosenentries-holder'>
-		<h3> Entries for {{title}} </h3>
-		{{#each entry_needed}}
-			{{@index}}: {{> chosenentry }}
-		{{/each}}
+	<div class='col-sm-3 chosenentries-holder col-sm-offset-1 rounded'>
+		{{> entrylist }}
+	</div>
+	<div class='col-sm-3 col-sm-offset-1  chosenentries-holder rounded'>
+		{{> chosenentries }}
 	</div>
 </template> 
 
-<template name='entrylist'>
-	<div class='w3-light-gray entrylist'>
-		<h4> Or choose one someone else created! </h4>
-		<div class='entrylist-holder' style="color:black">
-			{{#each all_entries}}
-				<p> {{title}} : {{description}} </p>
-			{{/each}}
+<template name='chosenentries'>
+	<h3> Your entries </h3>
+	{{#each all_entries}}
+		<div class='entries-chosen row' id='{{entry_title}}'>
+			<div class='col-sm-8'>
+				<h5> {{seed}} : {{entry_title}} </h5>
+			</div>
+			<div class='col-sm-4'>
+				<img class='entrylogo' src='{{image_url}}'>
+			</div>
+			
 		</div>
-	</div>
+	{{/each}}
 </template>
 
-<template name='chosenentry'>
-	<p> Entry {{ entryid }}: {{ name }} </p>
+<template name='entrylist'>
+	<h4> Or choose one someone else created! </h4>
+	{{#each all_entries}}
+		<div class='entries-chosen row' id='{{entry_title}}'>
+			<div class='col-sm-4'>
+				<img class='entrylogo' src='{{image_url}}'>
+			</div>
+			<div class='col-sm-8'>
+				<div class='entrylist-holder' title='{{entry_title}}' imageurl='{{image_url}}' id='{{_id}}'> {{ entry_title }} </div>
+			</div>
+		</div>
+	{{/each}}
 </template>
-
-<template name='roundendslist'>
-	{{> datepicker num=1 }}
-</template>
-
-<template name='datepicker'>
-	<div class='row'>
-		<p> Round 1 end time: </p>
-		<input type='text' placeholder='DD' /> /
-		<input type='text' placeholder='MM' /> /
-		<input type='text' placeholder='YY' />
-	</div>
-</template>
-
 
 <template name='createentry'>
   <div class='create-entry-container'>
-  	<h4> New Entry </h4>
-	<label> Title </label>
+	<label> Entry Title: </label>
 	<input id='newEntryTitle' type="text" style="color:black" name="title" placeholder="Title" color="black" />
-	<label> Description </label>
-	<input id='newEntryDescription' class='w3-input' style="color:black" type="text" name="description" placeholder="Description" />
+	<h4> Logo </h4>
+	{{#each urls}}
+		<img class='entrylogo' id='logo_{{temp_id}}' src='{{url}}'>
+	{{/each}}
   </div>
 </template>

@@ -24,3 +24,6 @@ accounts-password@1.3.5
 cfs:standard-packages
 kadira:flow-router
 kadira:blaze-layout
+practicalmeteor:mocha
+dburles:factory
+underscore
