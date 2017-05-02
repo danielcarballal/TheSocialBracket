@@ -45,21 +45,39 @@ export class BracketsCollection extends Mongo.Collection {
     doc.brac_round = 0;
     doc.usersVoted = [];
 
+    console.log('********');
+    console.log('Bracket creation process information');
+    console.log(doc);
+
     const result = super.insert(doc, callback);
     return result;
   }
 
   /* 
-    Record a vote. This will take a 
+    Record a vote. 
+
+    selector - Selector for ids to record vote for. More than likely, it should be {_id : id}
+
+    votedFor - Dictionary of matchup id's to the seed value for the user's choice. This does not need to
+    have an entry for every possible value.
+
+    userId - The voter's user ID
   */
-  recordVote(selector, votedFor) {
+  recordVote(selector, votedFor, userId) {
+    /*
+      Asynchronous call to Brackets database
+    */
     const brac = Brackets.findOne(selector);
     const old_entries = brac['ord_entries'];
 
     if(old_entries === null){
-      console.log('Vote not recorded for unfound bracket');
+      throw new Meteor.Error('Vote not recorded for unfound bracket');
       return;
     }
+    if(brac['usersVoted'].indexOf(userId) != -1){
+      throw new Meteor.Error('Users may only vote on a bracket once per round!!');
+    }
+
     var new_entries = [];
     for(var i = 0, len = old_entries.length; i < len; i++){
       var entry = old_entries[i];
@@ -76,11 +94,25 @@ export class BracketsCollection extends Mongo.Collection {
         new_entries.push(entry);
       }
     }
-    Brackets.update(selector, {$set : { ord_entries : new_entries } } );
+
+    var newUsersVoted = brac['usersVoted'];
+    newUsersVoted.push(userId);
+
+    Brackets.update(selector, 
+      {$set : { ord_entries : new_entries, usersVoted : newUsersVoted } } );
   }
 
+  /*
+    Next Round 
+
+    Meteor Collection Method for updating all of the brackets found by selector
+  */
   nextRound(selector){
     var nextRound = -1;
+
+    /*
+      Process round, given the current list ordered lists
+    */
     var process_func = function(x){
       var ret_arr = [];
 
@@ -90,17 +122,16 @@ export class BracketsCollection extends Mongo.Collection {
         if(entry['entry'] == null){
           if(entry['matchup'] != null){
 
+            console.log('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')
+            console.log(x);
+
             //Find the entry with the most numVotes in x, and pull their entry information
             var max_entry = x.reduce( (acc, dont_need_this_garbage, curIndex, x) => 
                               x[curIndex]['entry'] == null ? 
-                                acc : 
-                                (x[curIndex]['matchup'] == entry['matchup'] && x[curIndex]['numVotes'] > acc['numVotes'] ? 
-                                  x[curIndex]
-                                  : acc),
-                              {
-                                numVotes : '-1',
-                                entry : null
-                              } );
+                                acc : (x[curIndex]['matchup'] == entry['matchup'] && x[curIndex]['numVotes'] > acc['numVotes'] ? 
+                                  x[curIndex] : acc),
+                              {numVotes : '-1',
+                                entry : null} );
 
             nextRound = max_entry['round'] + 1;
 
@@ -124,11 +155,12 @@ export class BracketsCollection extends Mongo.Collection {
       }
 
       // Second pass -- add new matchup result entries to previously undecided round. We will
-      // Find which elements are 
+      // Find which elements should face each other in the next round.
       var matchup_id = 1;
+      
       for(var i = 0; i < ret_arr.length; i++){
         if(ret_arr[i].round === nextRound){
-          ret_arr[i].matchup = matchup_id;
+          ret_arr[i]['matchup'] = matchup_id;
 
           while(i < ret_arr.length && ret_arr[i] != ' Undecided!!'){
             i++;
@@ -136,6 +168,7 @@ export class BracketsCollection extends Mongo.Collection {
 
           if(i < ret_arr.length){
             ret_arr[i] = {matchup : matchup_id};
+            end_of_bracket = false;
           }
 
           while(i < ret_arr.length && ret_arr[i].round != nextRound){
@@ -143,7 +176,7 @@ export class BracketsCollection extends Mongo.Collection {
           }
 
           if(i < ret_arr.length){
-            ret_arr[i].matchup = matchup_id;
+            ret_arr[i]['matchup'] = matchup_id;
           }
 
           matchup_id++;
@@ -151,25 +184,36 @@ export class BracketsCollection extends Mongo.Collection {
       }
       return ret_arr;
     }
+
     const original_entries = Brackets.findOne(selector)['ord_entries'];
 
     // process_func(original_entries);
 
     var ret_arr = process_func(original_entries);
 
-    console.log('&&&&&&&&&**********FINAL********&&&&&&&&');
-    console.log(ret_arr);
+    var end_of_bracket = true;
+    for(var i = 0; i < ret_arr.length; i++){
+      if(ret_arr[i]['entry'] === undefined){
+        end_of_bracket = false
+      }
+    }
 
     if(nextRound != -1){
+      console.log('********');
+      console.log('Bracket round process information');
+      console.log(ret_arr);
+      console.log(end_of_bracket);
       Brackets.update(selector, 
         {$set : 
           { ord_entries : ret_arr,
-            brac_round : nextRound,
-            winnerFound : ret_arr.indexOf(' Undecided!!') === -1 } 
-        } 
+            usersVoted : [],
+            winnerFound : end_of_bracket },
+        $inc :
+          { brac_round : 1}
+        }
       );
     } else {
-      console.log('Warning: unable to process round');
+      throw new Meteor.Error('Warning: unable to process round');
     }
   }
 
@@ -219,6 +263,11 @@ if(Meteor.isServer){
   console.log('*************');
   console.log('Bracket Information\n');
   console.log('Count : ' + Brackets.find({}).count());
-  console.log('**************')
+  console.log('**************');
+
+  console.log('*************');
+  console.log('Entries Information\n');
+  console.log('Count : ' + Brackets.find({}).count());
+  console.log('**************');
 }
 

@@ -13,69 +13,101 @@
   {{> Template.dynamic template=main}}
 </template>
 
+<template name='bracketlist_contain'>
+  {{> Template.dynamic template=bracketlist}}
+</template>
+
 <!-- Template with list of all brackets. Links to those brackets -->
 <template name="bracketlist">
-  <div class="col-sm-9 col-sm-offset-3">
-  <h1> Bracket List </h1>
-  <div class="container">
-    <div class="row bracket_entry">
-        <div class='col-sm-2'>
-          <h2> Title </h2>
-       </div>
-       <div class='col-sm-4'>
-          <h2> Description </h2>
-       </div>
-       <div class='col-sm-2'>
-          <h2> Created By </h2>
-       </div>
-       <div class='col-sm-4'>
-          <h2> Link </h2>
+  <div class="col-sm-10 col-sm-offset-2">
+    <div class='row header-create'>
+        <div class='col-sm-12'>
+          <h1> Bracket List </h1>
         </div>
     </div>
-    {{#each allBrackets}}
-      <div class="row bracket_entry">
+    <div class="container">
+      <div class="row bracket-title rounded" style='color: white; background-color: #808080;'>
         <div class='col-sm-2'>
-          {{title}}
-       </div>
-       <div class='col-sm-4' style='font-family: serif; font-style:italic;'>
-          {{description}}
-       </div>
-       <div class='col-sm-2'>
-          {{username}} ({{owner}})
-       </div>
-
-       <button class='btn-primary link_to_brac' id='{{_id}}'> Go to bracket </button> 
+            <h4 class='userhint'> Title </h4>
+        </div>
+        <div class='col-sm-4'>
+            <h4 class='userhint'> Description </h4>
+        </div>
+        <div class='col-sm-2'>
+            <h4 class='userhint'> Round </h4>
+        </div>
+        <div class='col-sm-2'>
+            <h4 class='userhint'> Link </h4>
+        </div>
       </div>
-    {{/each}}  
+      {{#each allBrackets}}
+        <div class="row bracket_entry" style='margin-top: 2px'>
+          <div class='col-sm-2' style='border-right: 2px black solid'>
+            <p>  {{title}} </p>
+         </div>
+         <div class='col-sm-4' style='font-family: serif; font-style:italic;'>
+            <p> {{description}} </p>
+         </div>
+         <div class='col-sm-2' style='font-family: serif; font-style:italic;'>
+            <p> {{brac_round}} </p>
+         </div>
+         <div class='col-sm-2'>
+            <button class='btn-primary link_to_brac my-button' id='{{_id}}'> Go to bracket </button> 
+          </div>
+        </div>
+      {{/each}}  
+    </div>
   </div>
-</div>
 </template>
 
 <!-- Template with list of all brackets created by the current user. Links to those brackets by clicking  -->
 <template name="personalbracketlist">
-  <div class="col-sm-9 col-sm-offset-3">
-  <h1> Bracket List </h1>
-  <div class="container">
-    {{#each allBrackets}}
-      <div class="row link_to_brac" id='{{_id}}' href="localhost:3000/bracket/{{_id}}" style="border: 2px black solid">
+  <div class="col-sm-10 col-sm-offset-2">
+    <div class='row header-create'>
+        <div class='col-sm-12'>
+          <h1> Your Brackets </h1>
+        </div>
+    </div>
+    <div class="container" style='margin: 20px;'>
+      <div class="row bracket-title rounded" style='color: white; background-color: #808080;'>
+        <div class='col-sm-2'>
+            <h4 class='userhint'> Title </h4>
+        </div>
         <div class='col-sm-4'>
-          {{_id}}
-       </div>
-       <div class='col-sm-4'>
-          {{description}}
-       </div>
+            <h4 class='userhint'> Description </h4>
+        </div>
+        <div class='col-sm-2'>
+            <h4 class='userhint'> Round </h4>
+        </div>
+        <div class='col-sm-2'>
+            <h4 class='userhint'> Link </h4>
+        </div>
       </div>
-
-    {{/each}}  
+      {{#each allBrackets}}
+        <div class="row bracket_entry" style='margin-top: 2px'>
+          <div class='col-sm-2'>
+            <p>  {{title}} </p>
+         </div>
+         <div class='col-sm-4' style='font-family: serif; font-style:italic;'>
+            <p> {{description}} </p>
+         </div>
+         <div class='col-sm-2 '>
+            <p> {{brac_round}} {{#if finished}} Finished!! {{/if}} </p>
+        </div>
+         <div class='col-sm-2 '>
+            <button class='btn-primary link_to_brac my-button' id='{{_id}}'> Go to bracket </button> 
+          </div>
+        </div>
+      {{/each}}  
+    </div>
   </div>
-</div>
 </template>
 
 <!-- Sidebar template -->
 <template name="sidebar">
   <div id="sidebar-wrapper">
         <ul class="sidebar-nav">
-           <p style="color: white" class='logo_wrap'> <a class='logo'>{</a> The Social Bracket </p>
+           <p style="color: white" class='logo_wrap'> <a class='logo'>}</a> The Social Bracket </p>
             <li>
                 <a id="see_all_brackets" href='/all_brackets'>See all Brackets</a>
             </li>
@@ -94,6 +126,11 @@
 
 <!-- Template for individual bracket -->
 <template name="bracket">
+  <div class='row header-create'>
+      <div class='col-sm-12'>
+        <h1> Bracket </h1>
+      </div>
+  </div>
   {{#if exists}}
     <div class='col-sm-9 col-sm-offset-3 bracket-container'>
       <!-- There should always be 2**n - 1 entries in this list -->
@@ -103,24 +140,24 @@
           <p style='font-style:italic'> {{description}} </p>
           {{#if winnerFound}}
             <div class='winner entry-storer row' id='{{ent.entry_id}}' matchup='{{ent.matchup}}'>
-              <div class='entry-title col-sm-6'>
+              <div class='entry-title col-sm-9'>
                   <p class='entry-style'> Winner: {{victorTitle}}</p>
               </div>
-              <div class='col-sm-4'>
+              <div class='col-sm-3'>
                 <img style='width:100%' src='{{victorImage}}'>
               </div>
             </div>
           {{/if}}
-          <p style='font-style:italic'> Created by {{username}} on {{createdAt}} </p>
+          <p style='font-style:italic'> Created {{#if username}} by {{username}} {{/if}} on {{createdAt}} </p>
         </div>
       </div>
 
       {{> tree oent=orderedentries }}
        <p style="color : red"> {{ errorMessage }} </p>
-      <button id="submitVotes" class="btn-primary"> Submit your votes! </button>
+      <button id="submitVotes" class="btn-primary my_button"> Submit your votes! </button>
       {{#if user_is_creator }}
-        <button id="nextRound" class="btn-success"> Next Round </button>
-        <button id="deleteBracket" class="btn-danger"> Delete Bracket </button>
+        <button id="nextRound" class="btn-success my_button"> Next Round </button>
+        <button id="deleteBracket" class="btn-danger my_button"> Delete Bracket </button>
       {{/if}}
     </div>
   {{else}}
@@ -137,8 +174,8 @@
     <li class='entry-container'>
     {{#if ent.userChoice}}
       <div class='entry-storer row' id='{{ent.entry_id}}' style='background-color: green' matchup='{{ent.matchup}}'>
-          <div class='entry-title col-sm-6'>
-              <p class='entry-style'> <a style='color: #608FD6;'> {{ent.seed}} </a> {{ent.entry.entry_title}}</p>
+          <div class='entry-title col-sm-8'>
+              <p class='entry-style'> {{ent.entry.entry_title}}</p>
           </div>
           <div class='col-sm-4'>
             <img style='width:100%' src='{{ent.entry.image_url}}'>
@@ -147,18 +184,20 @@
     {{else}}
       {{#if ent.hasChoice}}  
         <div class='entry-storer row' id='{{ent.entry_id}}' style='background-color: #007FFF' matchup='{{ent.matchup}}' seed='{{ent.seed}}'>
-            <div class='entry-title col-sm-6'>
-              <a class='seed-entry'> {{ent.seed}} </a>
-              <p class='entry-style'>  {{ent.entry.entry_title}}</p>
-              <p> <a class='num-votes-style'> Votes : {{ent.numVotes}} </a> </p>
+            <div class='col-sm-8'>
+              <div class='row entry-title'>
+                <a class='seed-entry'> {{ent.seed}} </a>
+                <p class='entry-style' style='margin-bottom:2px'>  {{ent.entry.entry_title}}</p>
+                <p class='userhint num-votes-style' style='margin-bottom:2px; color: black'> <a> Votes : {{ent.numVotes}} </a> </p>
+              </div>
             </div>
             <div class='col-sm-4'>
-              <img style='width:100%' src='{{ent.entry.image_url}}'>
+              <img class='entryimage' src='{{ent.entry.image_url}}'>
             </div>
         </div>
         {{else}}
         <div class='entry-storer row' seed='{{ent.seed}}'>
-            <div class='entry-title col-sm-6'>
+            <div class='entry-title col-sm-8'>
               <p> {{ent.entry.entry_title}} </p>
             </div>
             <div class='col-sm-4'>

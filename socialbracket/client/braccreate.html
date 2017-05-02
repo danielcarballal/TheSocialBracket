@@ -1,62 +1,71 @@
 
 <template name='createbracket'>
 	<div class='col-sm-10 col-sm-offset-2'>
-		<div class='row header-create'>
-			<div class='col-sm-12'>
-				<h1> Bracket Creation </h1>
-			</div>
-		</div>
 		<div class='row'>
 			<div class='createbracket'>
 				<div class="row">
 					<div class="col-sm-10 col-sm-offset-1 title-creation-box">
 						{{#if hasTitle}}
-							<div class='row'>
+							<div class='row' style='background-color: #808080;'>
 								<p class='userinfo'>
 									Welcome to The Social Bracket! This is your chance to use brackets to answer some of the most pressing questions you might have. This of anything you want: sports, history, politics, or anything really and make a question. Then share the link with your friends and see their opinions flood in!
 								</p>
 								<h3 class='step1'> 1 </h3> 
-								<h5 class='col-sm-offset-1'> What interesting question could be Bracketized? </h5>
+								<h4 class='col-sm-offset-1'> What interesting question could be Bracketized? </h4>
 							</div>
 							<div class='row'>
 								<div class='col-sm-11 col-sm-offset-1'>
 									<h6 class='userhint'> Bracket Title </h6>
-									<input class='w3-input' type='text' id='bracket_title'/>
+									<input class='w3-input form-control' type='text' id='bracket_title'/>
 								</div>
 							</div>
 							<div class='row'>
 								<div class='col-sm-11 col-sm-offset-1'>
 									<h6 class='userhint'> Description </h6>
-									<textarea class='w3-input' rows='3' id='bracket_description' placeholder='Description'> </textarea>
+									<textarea class='w3-input form-control' rows='3' id='bracket_description' placeholder='Description'> </textarea>
 								</div>
 							</div>
 							<div class='row'>
-								<div class='col-sm-offset-1'>
+								<div class='col-sm-offset-1 col-sm-11'>
 									<p class='userhint'> Number of teams </p>
-									<select name="numteams" id='numteams'>
+									<select class='form-control' name="numteams" id='numteams' style='width: 20%'>
 									    <option value="four" selected>4</option>
 									    <option value="eight">8</option>
 									    <option value="sixteen">16</option>
 									</select>
+									<div class='checkbox'>
+										<input type='checkbox' id='private'/> <p class='userhint'> Private Bracket </p>
+									</div>
+									<div class='checkbox'>
+										<input type='checkbox' id='randomize'/> <p class='userhint'> Randomize the seeds </p>
+									</div>
 								</div>
 							</div>
-							<p style="color: red"> {{errorMessage}} </p>
-							<div class='row'>
-								<div class='col-sm-offset-1'>
-									Private? <input type='checkbox' id='private' />
-								</div>
-							</div>
+
 							<button style="width:100%" class='btn-success next'> Next </button>
 						{{else}}
-							<div class='row'>
+							<div class='row' style='background-color: #808080;'>
+								<p class='userinfo'>
+									Choose the entries you think might do well. For each entry, you can either create a new one or select from previously created entries.
+								</p>
 								<h3 class='step1'> 2 </h3> 
-								<h5 style='font-family : Ariel, Helvetica, Georgia'> Choose the entries you think might do well. Choose your entries in the order you want the seeds. </h5>
+								<h4 class='col-sm-offset-1'> Choose your entries </h4>
 							</div>
-							<div class='row'>
-								{{> entrycreationlist}}
-							</div>
+							
+							{{> entrycreationlist}}
 							<p style="color: red"> {{errorMessage}} </p>
-							<div class='row' style='margin-top: 20px'>
+							<div class='row' style='background-color: #808080;'>
+								<h3 class='step1'> 3 </h3> 
+								<h4 class='col-sm-offset-1'> Check your entries </h4>
+							</div>
+							<div class='row' style='padding: 20px;'>
+								<div class='col-sm-12'>
+									{{> chosenentries_alt}}
+								</div>
+							</div>
+
+							
+							<div class='row' style='margin-top: 20px; padding: 20px;'>
 								<button class="btn-success my-button" id='submit_bracket'> Create Bracket </button>
 								<button class="btn-warning my-button" id='back'> Restart </button>
 							</div>
@@ -70,18 +79,17 @@
 
 <!-- Contains template for creating a new entry or selecting from existing ones -->
 <template name='entrycreationlist'>
-  	<div class='entry-creator w3-container col-sm-4 rounded'>
-  		<div class='row createentry'>
-		  	<h3 style='text-align: center'> Create Entry </h3>
-			  {{> createentry }}
-			<button class='create_entry' style="width:50%; margin-left:25%"> Add Entry </button>
+	<div class='row' style='padding: 20px;'>
+	  	<div class='entry-creator w3-container col-sm-5 rounded'>
+	  		<div class='row createentry'>
+			  	<h3 style='text-align: center'> Create Entry </h3>
+				  {{> createentry }}
+				<button class='create_entry btn-primary my-button' style="width:50%; margin-left:25%;"> Add Entry </button>
+			</div>
 		</div>
-	</div>
-	<div class='col-sm-3 chosenentries-holder col-sm-offset-1 rounded'>
-		{{> entrylist }}
-	</div>
-	<div class='col-sm-3 col-sm-offset-1  chosenentries-holder rounded'>
-		{{> chosenentries }}
+		<div class='col-sm-5 col-sm-offset-2 allentries-holder rounded'>
+			{{> entrylist }}
+		</div>
 	</div>
 </template> 
 
@@ -90,37 +98,67 @@
 	{{#each all_entries}}
 		<div class='entries-chosen row' id='{{entry_title}}'>
 			<div class='col-sm-8'>
-				<h5> {{seed}} : {{entry_title}} </h5>
+				<h5> {{entry_title}} </h5>
 			</div>
 			<div class='col-sm-4'>
 				<img class='entrylogo' src='{{image_url}}'>
 			</div>
-			
+		</div>
+	{{/each}}
+</template>
+
+<template name='chosenentries_alt'>
+	{{#each all_entries}}
+		<div class='entries-chosen-alt row' id='{{entry_title}}'>
+			<div class='col-sm-6'>
+				<h5> {{entry_title}} </h5>
+			</div>
+			<div class='col-sm-2 col-sm-offset-2'>
+				<img class='entrylogo' src='{{image_url}}'>
+			</div>
 		</div>
 	{{/each}}
 </template>
 
 <template name='entrylist'>
 	<h4> Or choose one someone else created! </h4>
-	{{#each all_entries}}
-		<div class='entries-chosen row' id='{{entry_title}}'>
-			<div class='col-sm-4'>
-				<img class='entrylogo' src='{{image_url}}'>
+	<input id='searchEntry' type=search class='form-control' name="searchEntry" placeholder="Search entries..." />
+	<div class='scrollable'>
+		{{#each all_entries_indiscriminate}}
+			<div class='entries-chosen row' id='{{entry_title}}'>
+				<div class='col-sm-4'>
+					<img class='entrylogo' src='{{image_url}}'>
+				</div>
+				<div class='col-sm-8 entrylist-holder' title='{{entry_title}}' imageurl='{{image_url}}' id='{{_id}}'>
+						<div class='row'>
+							<p> {{ entry_title }} </p>
+						</div>
+						{{#if more_than_3 num_bracs}} 
+							<div class='row'>
+								<p style='font-size:10px'> Used in {{num_bracs}} </p>
+							</div>
+						{{/if}}
+				</div>
 			</div>
-			<div class='col-sm-8'>
-				<div class='entrylist-holder' title='{{entry_title}}' imageurl='{{image_url}}' id='{{_id}}'> {{ entry_title }} </div>
-			</div>
-		</div>
-	{{/each}}
+		{{/each}}
+	</div>
 </template>
 
 <template name='createentry'>
   <div class='create-entry-container'>
 	<label> Entry Title: </label>
-	<input id='newEntryTitle' type="text" style="color:black" name="title" placeholder="Title" color="black" />
-	<h4> Logo </h4>
+	<input id='newEntryTitle' class='w3-input form-control' type="text" style="color:black" name="title" placeholder="Title" color="black" />
+	<h4 class='userhint'> Default Logos </h4>
+	<div style='background-color: rgba(1, 64, 100, .3);'>
 	{{#each urls}}
 		<img class='entrylogo' id='logo_{{temp_id}}' src='{{url}}'>
 	{{/each}}
+	</div>
+	<div class='row'>
+		<div class='col-sm-11 col-sm-offset-1'>
+			<h6 class='userhint'> Or copy in a custom URL of an image </h6>
+			<input class='w3-input form-control' type='text' id='customImageURL'/>
+		</div>
+	</div>
   </div>
 </template>

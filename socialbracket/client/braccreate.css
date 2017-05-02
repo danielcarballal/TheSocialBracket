@@ -41,13 +41,13 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-black,.w3-hover-black:hover{color:#fff!important;background-color:#000!important}
 
 .entrylist-holder {
-	background-color: #00bfa5;
-	padding: 10%;
+	background-color: rgba(1, 64, 100, .3);
 	cursor: pointer;
 	font-size:100%;
 	margin-top: 5px;
 	margin-bottom: 5px;
 	text-align : center;
+	border-radius: 0 0 20px 0;
 }
 
 ::-webkit-input-placeholder { 
@@ -65,40 +65,24 @@ textarea {
 	padding: 10px;
 }
 
-.chosenentries-holder {
-	background-image: linear-gradient(to right, #ccc, #333);
+.scrollable {
+
+}
+
+.allentries-holder {
+	background-image: linear-gradient(to right, #999, #666);
 	overflow: auto;
-	max-height: 400px;
-	min-height: 100px;
+	max-height: 500px;
+	min-height: 300px;
 	text-align: center;
 }
 
-.regular-checkbox {
-	-webkit-appearance: none;
-	background-color: #fafafa;
-	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
-	border-radius: 3px;
-}
-
-.regular-checkbox:active, .regular-checkbox:checked:active {
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
-}
-
-.regular-checkbox:checked {
-	background-color: #e9ecee;
-	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
-	color: #99a1a7;
-}
-
-.regular-checkbox:checked:after {
-	content: '\2714';
-	font-size: 14px;
-	position: absolute;
-	top: 0px;
-	left: 3px;
-	color: #99a1a7;
+.chosenentries-holder {
+	background-image: linear-gradient(to right, #ccc, #666);
+	overflow: auto;
+	max-height: 400px;
+	min-height: 200px;
+	text-align: center;
 }
 
 .entry-creator {
@@ -111,11 +95,28 @@ textarea {
 
 .rounded{
 	border-radius: 10px;
-	padding: 10px;
 }
 
 .entries-chosen {
 	border-top: 1px gray solid;
+	padding: 3px;
+}
+
+.entries-chosen-alt {
+	background-color: gray;
+	width: 175px;
+}
+
+.entries-chosen-alt:nth-child(2n) {
+	margin-left: 175px;
+}
+
+.entries-chosen-alt:nth-child(4n) {
+	margin-left: 350px;
+}
+
+.entries-chosen-alt:nth-child(8n) {
+	margin-left: 525px;
 }
 
 .header-create {
@@ -179,5 +180,9 @@ a{background-color:transparent;-webkit-text-decoration-skip:objects}
 }
 
 .my-button {
+	margin-top: 10px;
+	margin-bottom: 10px;
 	border-radius: 10px;
+	padding: 5px;
+	font-family: Verdana;
 }

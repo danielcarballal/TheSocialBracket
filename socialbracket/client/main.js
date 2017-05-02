@@ -7,8 +7,6 @@ import { Meteor } from 'meteor/meteor';
 import { Brackets } from '../lib/collection.js';
 
 import { Session } from 'meteor/session';
-// var Brackets = new Mongo.Collection('brackets');
-
 
 Template.sidebar.onCreated(function sidebarOnCreated(){
 	Meteor.subscribe('users');
@@ -27,9 +25,16 @@ Template.bracketlist.helpers({
 	}
 });
 
+Template.personalbracketlist.events({
+	'click .link_to_brac'(event, instance){
+		var linkid = event['target']['id'];
+		FlowRouter.go('bracket', { bracid : linkid });
+	}
+});
+
 Template.personalbracketlist.helpers({
 	'allBrackets' : function(){
-		return Brackets.find({creatorID : Meteor.userId() });
+		return Brackets.find({owner : Meteor.userId() });
 	}
 });
 

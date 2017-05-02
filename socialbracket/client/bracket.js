@@ -24,7 +24,6 @@ Template.bracket.helpers({
 	},
 	'title' : function(){
 		var b_id = Session.get('bracid');
-		console.log(Brackets.findOne({_id : b_id}));
 		return Brackets.findOne({_id : b_id})['title'];
 	},
 	'username': function(){
@@ -45,7 +44,6 @@ Template.bracket.helpers({
 	},
 	'winnerFound' : function(){
 		var b_id = Session.get('bracid');
-		console.log(Brackets.findOne({_id : b_id})['winnerFound']);
 		return Brackets.findOne({_id : b_id})['winnerFound'];
 	},
 	'all_entries' : function(){
@@ -98,32 +96,51 @@ Template.bracket.helpers({
 	'victorTitle' : function(){
 		var b_id = Session.get('bracid');
 		var ordent = Brackets.findOne({_id : b_id})['ord_entries'];
-		var winningEntry = ordent[(ordent.length / 2) - .5]['entry']['entry_title'];
-		return winningEntry;
+		if(ordent[(ordent.length / 2) - .5]['entry'] != null){
+			var winningTitle = ordent[(ordent.length / 2) - .5]['entry']['entry_title'];
+			return winningTitle;
+		}
+		else {
+			return '';
+		}
 	},
 	'victorImage' : function(){
 		var b_id = Session.get('bracid');
 		var ordent = Brackets.findOne({_id : b_id})['ord_entries'];
-		var winningImage = ordent[(ordent.length / 2) - .5]['entry']['image_url'];
-		return winningImage;
+		if(ordent[(ordent.length / 2) - .5]['entry'] != null){
+
+			var winningImage = ordent[(ordent.length / 2) - .5]['entry']['image_url'];
+			return winningImage;
+		}
+		else {
+			return '';
+		}
 	}
 });
 
 Template.bracket.events({
 	'click #submitVotes'(event, instance) {
 		Meteor.call('singleBrac.vote', Session.get('bracid'), Meteor.userId(), Session.get('chosenWinners'), function(error, result){
+			Session.set('errorMessage','');
 			if(error){
-				Session.set('errorMessage', 'Server is currently unavailable');
-				console.log(error);
+				Session.set('errorMessage', 'Unable to process votes: ' + error['error']);
+				return;
 			}
-			console.log(result);
 			Session.set('chosenWinners', {});
-			FlowRouter.go('bracket', {bracid : Session.get('bracid')})
+			FlowRouter.go('bracket', {bracid : Session.get('bracid')});
 		});
 	},
 	'click #deleteBracket'(event, instance){
-		console.log('Delete clicked');
-		Meteor.call('brackets.remove',  Session.get('bracid'));
+		Meteor.call('brackets.remove',  Session.get('bracid'), function(error, result){
+			Session.set('errorMessage','');
+			if(error){
+				Session.set('errorMessage', 'Unable to delte bracket: ' + error['error']);
+				return;
+			}
+			Session.set('chosenWinners', {});
+			Session.set('bracid', id_num);
+			FlowRouter.go('createbracket');
+		});
 	},
 	'click #nextRound'(event, instance){
 		Meteor.call('singleBrac.nextRound', Session.get('bracid'));

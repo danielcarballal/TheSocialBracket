@@ -30,15 +30,20 @@ body {
   cursor: pointer;
 }
 
+.entryimage{
+  width:100%;
+  margin-top: 5px;
+}
+
 .entry-title {
-	margin-left: 20px;
   margin-bottom: 0px;
+  padding-left: 20px;
+  padding-top: 0px;
   cursor: pointer;
   pointer-events : none;
 }
 
 .entry-style {
-  margin: 0px;
   font-size : 100%;
   vertical-align: baseline;
   font-weight: bold;
@@ -57,9 +62,9 @@ body {
 
 .num-votes-style{
   font-family:sans-serif; 
-  margin: 0px; 
-  font-size:12px; 
-  color:red;
+  margin-top: 0px; 
+  font-size:10px;
+  font-weight: bold;
 }
 
 .winner {
@@ -72,15 +77,23 @@ body {
 .bracket-container {
 	border: 3px black solid;
 	border-radius: 10px;
-	margin-top: 125px;
+	margin-top: 25px;
+  background-color: white;
+}
+
+.bracket-title {
+  text-align: center;
+  padding : 5px;
 }
 
 .bracket_entry {
-  padding: 20px;
-}
-
-.bracket_entry:nth-child(2n) {
+  margin-left : 20px;
+  margin-right : 20px;
+  padding: 3px;
   background-color: gray;
+  border-radius: 25px;
+  font-size : 100%;
+  font-family : Tahoma;
 }
 
 body,
